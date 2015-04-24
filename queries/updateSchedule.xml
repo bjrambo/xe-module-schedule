@@ -1,0 +1,15 @@
+<query id="updateSchedule" action="update">
+	<tables>
+		<table name="schedule_list" />
+	</tables>
+	<columns>
+		<column name="selected_date" var="selected_date" />
+		<column name="schedule_name" var="schedule_name" />
+		<column name="schedule_content" var="schedule_content" />
+		<column name="member_srl" var="member_srl" />
+		<column name="regdate" var="regdate" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="schedule_srl" var="schedule_srl" />
+	</conditions>
+</query>

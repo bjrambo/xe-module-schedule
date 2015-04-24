@@ -1,0 +1,11 @@
+<query id="getSchedule" action="select">
+	<tables>
+		<table name="schedule_list" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="schedule_srl" var="schedule_srl" />
+	</conditions> 
+</query>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module>
+	<grants />
+	<permissions>
+		<permission action="dispScheduleAdminEditorSetting" target="manager"/>
+	</permissions>
+	<actions>
+		<action name="dispScheduleAdminInsertModule" type="view" menu_name="schedule" menu_index="true" admin_index="true" standalone="true" />
+		<action name="dispScheduleAdminEditorSetting" type="view" />
+
+		<action name="procScheduleAdminInsertMid" type="controller" />
+
+		<action name="dispScheduleList" type="view" index="true" standalone="true" />
+		<action name="dispScheduleInsert" type="view" standalone="true" />
+		<action name="dispScheduleSchedule" type="view" />
+		<action name="dispScheduleDelete" type="view" />
+
+		<action name="procScheduleInsertSchedule" type="controller" />
+		<action name="procScheduleDeleteSchedule" type="controller" />
+	</actions>
+</module>

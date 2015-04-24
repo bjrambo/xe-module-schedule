@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin version="0.2">
+	<title xml:lang="ko">스케줄 일정</title>
+	<description xml:lang="ko">일정관리 기본 스킨입니다.</description>
+	<version>0.1</version>
+	<date>2015.04</date>
+	<author email_address="qw5414@naver.com" link="http://www.swhite523.com/">
+		<name xml:lang="ko">BJ람보</name>
+	</author>
+	<extra_vars>
+	</extra_vars>
+</skin>
