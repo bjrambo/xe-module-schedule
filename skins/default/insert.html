@@ -31,6 +31,13 @@
 			<h1>리스트 만들기</h1>
 
 			<div class="x_control-group">
+				<label class="x_control-label">스케줄 제목</label>
+				<div class="x_controls">
+					<input type="text" name="schedule_name" value="{$user_schedule->schedule_name}" style="width:80%;" />
+				</div>
+			</div>
+
+			<div class="x_control-group">
 				<label class="x_control-label">선택날자</label>
 				<div class="x_controls">
 					<span id="str_selected_date" cond="$user_schedule->schedule_regdate">{zdate($user_schedule->schedule_regdate, "Y-m-d")}</span>
@@ -65,14 +72,8 @@
 					</script>
 				</div>
 			</div>
-			<div class="x_control-group">
-				<label class="x_control-label">스케줄 제목</label>
-				<div class="x_controls">
-					<input type="text" name="schedule_name" value="{$user_schedule->schedule_name}" />
-				</div>
-			</div>
 
-			<div class="get_editor">{$editor}</div>
+			<div class="get_editor" cond="$config->viewconfig == 'Y'">{$editor}</div>
 
 		</section>
 		<div class="btnArea x_clearfix">

@@ -9,10 +9,12 @@ class scheduleModel extends schedule
 		if(self::$config === NULL)
 		{
 			$oModuleModel = getModel('module');
-			$config = $oModuleModel->getModuleConfig('myschedule');
+			$config = $oModuleModel->getModuleConfig('schedule');
 
-			if(!$config->menulist) $config->menulist = 'no';
-			if(!$config->menuname) $config->menuname = '내 스케줄';
+			if(!$config->viewconfig)
+			{
+				$config->viewconfig = 'Y';
+			}
 
 			self::$config = $config;
 		}

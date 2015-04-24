@@ -5,16 +5,22 @@
 		<permission action="dispScheduleAdminEditorSetting" target="manager"/>
 	</permissions>
 	<actions>
+		<!-- admin view -->
 		<action name="dispScheduleAdminInsertModule" type="view" menu_name="schedule" menu_index="true" admin_index="true" standalone="true" />
 		<action name="dispScheduleAdminEditorSetting" type="view" />
+		<action name="dispScheduleAdminConfig" type="view" />
 
+		<!-- admin Controller -->
 		<action name="procScheduleAdminInsertMid" type="controller" />
+		<action name="procScheduleAdminInsertConfig" type="controller" />
 
+		<!-- user view -->
 		<action name="dispScheduleList" type="view" index="true" standalone="true" />
 		<action name="dispScheduleInsert" type="view" standalone="true" />
 		<action name="dispScheduleSchedule" type="view" />
 		<action name="dispScheduleDelete" type="view" />
 
+		<!-- user Controller -->
 		<action name="procScheduleInsertSchedule" type="controller" />
 		<action name="procScheduleDeleteSchedule" type="controller" />
 	</actions>

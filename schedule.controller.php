@@ -24,7 +24,6 @@ class scheduleController extends schedule
 
 		$oScheduleModel = getModel('schedule');
 		$schedule = $oScheduleModel->getSchedule($schedule_srl);
-		debugPrint($schedule);
 
 		if(!$schedule->schedule_srl)
 		{
@@ -64,9 +63,18 @@ class scheduleController extends schedule
 
 		}
 
+
 		if(!in_array(Context::getRequestMethod(), array('XMLRPC', 'JSON')))
 		{
-			$redirectUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'mid', $this->module_info->mid, 'act', 'dispScheduleSchedule', 'schedule_srl', $args->schedule_srl);
+			if($config->viewconfig != 'Y')
+			{
+				$redirectUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'mid', $this->module_info->mid);
+			}
+			else
+			{
+				$redirectUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'mid', $this->module_info->mid, 'act', 'dispScheduleSchedule', 'schedule_srl', $args->schedule_srl);
+			}
+
 			$this->setRedirectUrl($redirectUrl);
 		}
 	}

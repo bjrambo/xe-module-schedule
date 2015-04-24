@@ -28,9 +28,12 @@
 					<a href="{getUrl('','mid',$mid,'act','dispScheduleDelete','schedule_srl', $val->schedule_srl)}" cond="$logged_info->is_admin == 'Y'">
 					<i class="xi-trash"></i></a>
 					<a href="{getUrl('','mid',$mid,'act','dispScheduleInsert','schedule_srl', $val->schedule_srl)}" cond="$logged_info->is_admin == 'Y'"><i class="xi-brush-point"></i></a>
-					<a href="{getUrl('','mid',$mid,'act','dispScheduleSchedule','schedule_srl', $val->schedule_srl)}">
+					<a href="{getUrl('','mid',$mid,'act','dispScheduleSchedule','schedule_srl', $val->schedule_srl)}" cond="$config->viewconfig == 'Y'">
 						<span class="list"> {$val->schedule_name}</span>
 					</a>
+					<span cond="$config->viewconfig != 'Y'">
+						<span class="list"> {$val->schedule_name}</span>
+					</span>
 				</div>
 			</td>
 		</tr>

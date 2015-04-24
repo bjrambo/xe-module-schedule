@@ -1,0 +1,25 @@
+<include target="_header.html" />
+
+<form ruleset="insertConfig" action="./" method="post" class="x_form-horizontal" id="fo_ncenterlite">
+	<input type="hidden" name="module" value="schedule" />
+	<input type="hidden" name="act" value="procScheduleAdminInsertConfig" />
+
+	<section class="section">
+		<h1>모듈설정</h1>
+		<div class="x_control-group">
+			<label class="x_control-label">보기형식</label>
+			<div class="x_controls">
+				<select name="viewconfig">
+					<option value="Y" selected="selected"|cond="$config->viewconfig=='Y'">사용함</option>
+					<option value="N" selected="selected"|cond="$config->viewconfig=='N'">사용안함</option>
+				</select>
+				<p>스케줄 클릭시 동작을 사용할 지 안할지 선택합니다.</p>
+			</div>
+		</div>
+	</section>
+	<div class="x_clearfix btnArea">
+		<div class="x_pull-right">
+			<button class="x_btn x_btn-primary" type="submit">{$lang->cmd_registration}</button>
+		</div>
+	</div>
+</form>

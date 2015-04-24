@@ -32,7 +32,7 @@ class scheduleView extends schedule
 		{
 			$selected_date = zDate(date('YmdHis'),"Ymd");
 		}
-		//출석달력 설정
+
 		$date_info = new stdClass();
 		$date_info->_year = substr($selected_date,0,4);
 		$date_info->_month = substr($selected_date,4,2);
@@ -40,6 +40,11 @@ class scheduleView extends schedule
 		$date_info->day_max = date("t",mktime(0,0,0,$date_info->_month,1,$date_info->_year));
 		$date_info->week_start = date("w",mktime(0,0,0,$date_info->_month,1,$date_info->_year));
 
+		// get the Config list
+		$oScheduleModel = getModel('schedule');
+		$config = $oScheduleModel->getConfig();
+
+		Context::set('config', $config);
 		Context::set('selected_date', $selected_date);
 		Context::set('admin_date_info', $date_info);
 		Context::set('getmodel', $oScheduleModel);
@@ -67,6 +72,10 @@ class scheduleView extends schedule
 
 		$editor = $oEditorModel->getModuleEditor('document', $this->module_info->module_srl, $schedule_srl, 'schedule_srl', 'content');
 
+		// get the Config list
+		$config = $oScheduleModel->getConfig();
+
+		Context::set('config', $config);
 		Context::set('editor', $editor);
 		if($schedules)
 		{
@@ -78,8 +87,16 @@ class scheduleView extends schedule
 
 	function dispScheduleSchedule()
 	{
-		$schedule_srl = Context::get('schedule_srl');
 		$oScheduleModel = getModel('schedule');
+		$config = $oScheduleModel->getConfig();
+
+		if($config->viewconfig != 'Y')
+		{
+			return new Object(-1, '잘못된 요청입니다.');
+		}
+
+		$schedule_srl = Context::get('schedule_srl');
+
 		$schedules = $oScheduleModel->getSchedule($schedule_srl);
 
 		Context::set('user_schedule', $schedules);

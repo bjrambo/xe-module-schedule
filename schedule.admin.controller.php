@@ -44,5 +44,22 @@ class scheduleAdminController extends schedule
 			$this->setRedirectUrl($redirectUrl);
 		}
 	}
+
+	function procScheduleAdminInsertConfig()
+	{
+		$oModuleController = getController('module');
+		$config->viewconfig = Context::get('viewconfig');
+
+		$this->setMessage('success_updated');
+
+		$oModuleController->updateModuleConfig('schedule', $config);
+
+		if(!in_array(Context::getRequestMethod(),array('XMLRPC','JSON')))
+		{
+			$returnUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminConfig');
+			header('location: ' . $returnUrl);
+			return;
+		}
+	}
 }
 /* End of file */

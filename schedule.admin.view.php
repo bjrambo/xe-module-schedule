@@ -47,6 +47,17 @@ class scheduleAdminView extends schedule
 		$security->encodeHTML('extra_vars..name','list_config..name');
 	}
 
+	function dispScheduleAdminConfig()
+	{
+		$oScheduleModel = getModel('schedule');
+		$config = $oScheduleModel->getConfig();
+
+		Context::set('config', $config);
+
+		$security = new Security();
+		$security->encodeHTML('config..');
+	}
+
 	function dispScheduleAdminEditorSetting()
 	{
 		$module_srl = Context::get('module_srl');
