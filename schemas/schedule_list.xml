@@ -4,5 +4,6 @@
 	<column name="schedule_name" type="varchar" size="250" notnull="notnull" />
 	<column name="schedule_content" type="bigtext" />
 	<column name="member_srl" type="number" size="11" notnull="notnull" />
-	<column name="regdate" type="varchar" size="20" notnull="notnull" />
+	<column name="first_time" type="varchar" size="4" notnull="notnull" />
+	<column name="last_time" type="varchar" size="4" notnull="notnull" />
 </table>

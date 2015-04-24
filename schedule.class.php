@@ -14,9 +14,21 @@ class schedule extends ModuleObject
 	function checkUpdate()
 	{
 		$oModuleModel = getModel('module');
+		$oDB = &DB::getInstance();
+
 		foreach($this->triggers as $trigger)
 		{
 			if(!$oModuleModel->getTrigger($trigger[0], $trigger[1], $trigger[2], $trigger[3], $trigger[4])) return true;
+		}
+
+		if(!$oDB->isColumnExists('schedule_list', 'first_time'))
+		{
+			return true;
+		}
+
+		if(!$oDB->isColumnExists('schedule_list', 'last_time'))
+		{
+			return true;
 		}
 
 		return false;
@@ -34,6 +46,16 @@ class schedule extends ModuleObject
 			{
 				$oModuleController->updateTrigger($trigger[0], $trigger[1], $trigger[2], $trigger[3], $trigger[4]);
 			}
+		}
+
+		if(!$oDB->isColumnExists('schedule_list', 'first_time'))
+		{
+			$oDB->addColumn('schedule_list', 'first_time', 'varchar', 4, true);
+		}
+
+		if(!$oDB->isColumnExists('schedule_list', 'last_time'))
+		{
+			$oDB->addColumn('schedule_list', 'last_time', 'varchar', 4, true);
 		}
 
 		return new Object(0, 'success_updated');
