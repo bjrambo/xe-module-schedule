@@ -17,7 +17,7 @@
 		<div cond="$logged_info->is_admin == 'Y'" class="x_control-group">
 			<label class="x_control-label" for="mid">{$lang->mid}</label>
 			<div class="x_controls">
-				<input type="text" name="mid" id="mid" value="m_schedule" />
+				<input type="text" name="mid" id="mid" value="m_schedule"|cond="!$module_info->mid" value="{$module_info->mid}"|cond="$module_info->mid" />
 				<a href="#about_mid" class="x_icon-question-sign" data-toggle="#about_mid">{$lang->help}</a>
 				<p id="about_mid" class="x_help-block" hidden="hidden">{$lang->about_mid}</p>
 			</div>
