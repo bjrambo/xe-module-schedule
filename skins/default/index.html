@@ -3,7 +3,6 @@
 {@$year=substr($selected_date,0,4)}
 {@$month=substr($selected_date,4,2)}
 {@$day=substr($selected_date,6,2)}
-{@ if(!$liststyle) $liststyle = 'calendar'; }
 
 
 
@@ -28,6 +27,4 @@
 </div>
 
 
-<include target="calendar.html" cond="$liststyle=='calendar'" />
-<include target="list.html" cond="$liststyle=='list'" />
 {$module_info->footer_text_m}

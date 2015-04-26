@@ -27,7 +27,6 @@ class scheduleView extends schedule
 		$selected_date = Context::get('selected_date');
 		$oScheduleModel = getModel('schedule');
 		$logged_info = Context::get('logged_info');
-		$liststyle = Context::geT('liststyle');
 		if(!$selected_date)
 		{
 			$selected_date = zDate(date('YmdHis'),"Ymd");
