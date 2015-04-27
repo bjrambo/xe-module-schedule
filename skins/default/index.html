@@ -4,17 +4,15 @@
 {@$month=substr($selected_date,4,2)}
 {@$day=substr($selected_date,6,2)}
 
-
-
 <div>
-{$module_info->header_text_m}
+	{$module_info->header_text_m}
 </div>
 
 <div class="navi" style="margin-left:10px; height:40px">
 	<a class="att-btn att-btn-primary" href="#"><i class="fa fa-calendar"></i> {$year}년 {$month}월</a>
 	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'liststyle', 'calendar')}" cond="$liststyle == 'list'">달력형</a>
 	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'liststyle', 'list')}" cond="$liststyle == 'calendar'">리스트형</a>
-	<div style="float:right; margin-right:10px; font-weight:none;" cond="$liststyle == 'calendar'">
+	<div style="float:right; margin-right:10px; font-weight:none;">
 		<a class="att-btn att-btn-primary" href="{getUrl('document_srl','','selected_date',zDate(date('YmdHis',mktime(0,0,0,$month-1, $day, $year)),'Ymd'))}">
 			이전달
 		</a>
@@ -23,8 +21,9 @@
 			다음달
 		</a>
 	</div>
-	<a class="att-btn att-btn-primary" href="{getUrl('act','dispScheduleAdminEditorSetting')}" cond="$logged_info->is_admin == 'Y'">point set</a>
+	<a class="att-btn att-btn-primary" href="{getUrl('act','dispScheduleAdminEditorSetting')}" cond="$logged_info->is_admin == 'Y'">에디터 설정</a>
 </div>
 
+<include target="calendar.html" />
 
 {$module_info->footer_text_m}
