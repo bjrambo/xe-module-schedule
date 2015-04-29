@@ -17,8 +17,17 @@
 		<!--@end-->
 		<tr><!-- class="today"|cond="sprintf('%s%s%02d',$admin_date_info->_year,$admin_date_info->_month,$_day) == zDate(date('Ymd'),'Ymd')" -->
 			<td class="date days">
+			{@
+				if($j%7==0) $week = $lang->unit_week[Sunday];
+				if($j%7==1) $week = $lang->unit_week[Monday];
+				if($j%7==2) $week = $lang->unit_week[Tuesday];
+				if($j%7==3) $week = $lang->unit_week[Wednesday];
+				if($j%7==4) $week = $lang->unit_week[Thursday];
+				if($j%7==5) $week = $lang->unit_week[Friday];
+				if($j%7==6) $week = $lang->unit_week[Saturday];
+			}
 				{@$check_date = sprintf("%s%s%02d",$admin_date_info->_year,$admin_date_info->_month,$_day)}
-				<a <!--@if($j%7==0)-->class="sunday"<!--@elseif($j%7==6)-->class="saturday"<!--@end--> href="{getUrl('act','dispScheduleInsert','selected_date',zDate(date('YmdHis',mktime(0,0,0,$admin_date_info->_month, $_day, $admin_date_info->_year)),"Ymd"))}">{$_day++}</a>
+				<a <!--@if($j%7==0)-->class="sunday"<!--@elseif($j%7==6)-->class="saturday"<!--@end--> href="{getUrl('act','dispScheduleInsert','selected_date',zDate(date('YmdHis',mktime(0,0,0,$admin_date_info->_month, $_day, $admin_date_info->_year)),"Ymd"))}">{$_day++} ({$week})</a>
 			</td>
 			<td class="list">
 			{@
