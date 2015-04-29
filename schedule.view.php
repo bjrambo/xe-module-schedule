@@ -55,10 +55,16 @@ class scheduleView extends schedule
 	{
 		$logged_info = Context::get('logged_info');
 
-		if($logged_info->is_admin != 'Y')
+		// check grant
+		if($this->module_info->module != "schedule")
 		{
-			return new Object(-1, '등록 및 삭제는 관리자만 가능합니다.');
+			return new Object(-1, "msg_invalid_request");
 		}
+		if(!$this->grant->write_schedule)
+		{
+			return new Object(-1, 'msg_not_permitted');
+		}
+		
 		$schedule_srl = Context::get('schedule_srl');
 		$oEditorModel = getModel('editor');
 

@@ -3,7 +3,11 @@
 		<a href="{getUrl('', 'mid', $module_info->mid)}">스케줄</a>
 	</li>
 	<li class="x_active"|cond="$act == 'dispScheduleAdminEditorSetting'">
-		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminEditorSetting')}">설정</a>
+		<a href="{getUrl('', 'mid', $module_info->mid, 'act', 'dispScheduleAdminEditorSetting')}">에디터설정</a>
+	</li>
+	
+	<li class="x_active"|cond="$act == 'dispScheduleAdminGrantInfo'">
+		<a href="{getUrl('', 'mid', $module_info->mid, 'act', 'dispScheduleAdminGrantInfo')}">권한 설정</a>
 	</li>
 </ul>
 <div class="x_page-header">

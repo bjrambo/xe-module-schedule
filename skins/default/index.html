@@ -21,7 +21,8 @@
 			다음달
 		</a>
 	</div>
-	<a class="att-btn att-btn-primary" href="{getUrl('act','dispScheduleAdminEditorSetting')}" cond="$logged_info->is_admin == 'Y'">에디터 설정</a>
+	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'act','dispScheduleAdminEditorSetting')}" cond="$grant->manager">에디터 설정</a>
+	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'act','dispScheduleAdminGrantInfo')}" cond="$grant->manager">권한 설정</a>
 </div>
 
 <include target="calendar.html" />

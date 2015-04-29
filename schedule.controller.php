@@ -7,13 +7,19 @@ class scheduleController extends schedule
 
 	function procScheduleInsertSchedule()
 	{
+		// check grant
+		if($this->module_info->module != "schedule")
+		{
+			return new Object(-1, "msg_invalid_request");
+		}
+		if(!$this->grant->write_schedule)
+		{
+			return new Object(-1, 'msg_not_permitted');
+		}
+
 		$obj = Context::getRequestVars();
 		$schedule_srl = Context::get('schedule_srl');
 		$logged_info = Context::get('logged_info');
-		if($logged_info->is_admin != 'Y')
-		{
-			return new Object(-1, '등록 및 삭제는 관리자만 가능합니다.');
-		}
 
 		$args = new stdClass();
 		$args->selected_date = $obj->selected_date;
