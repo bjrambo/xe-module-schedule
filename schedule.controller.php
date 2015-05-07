@@ -17,6 +17,9 @@ class scheduleController extends schedule
 			return new Object(-1, 'msg_not_permitted');
 		}
 
+		$oDB = DB::getInstance();
+		$oDB->begin();
+
 		$obj = Context::getRequestVars();
 		$schedule_srl = Context::get('schedule_srl');
 		$logged_info = Context::get('logged_info');
@@ -69,7 +72,6 @@ class scheduleController extends schedule
 
 		}
 
-
 		if(!in_array(Context::getRequestMethod(), array('XMLRPC', 'JSON')))
 		{
 			if($config->viewconfig != 'Y')
@@ -87,6 +89,19 @@ class scheduleController extends schedule
 
 	function procScheduleDeleteSchedule()
 	{
+		// check grant
+		if($this->module_info->module != "schedule")
+		{
+			return new Object(-1, "msg_invalid_request");
+		}
+		if(!$this->grant->write_schedule)
+		{
+			return new Object(-1, 'msg_not_permitted');
+		}
+
+		$oDB = DB::getInstance();
+		$oDB->begin();
+
 		$logged_info = Context::get('logged_info');
 		$obj = Context::getRequestVars();
 
@@ -110,6 +125,7 @@ class scheduleController extends schedule
 			$oDB->rollback();
 			return $output;
 		}
+
 		$oFileController = getController('file');
 		$oFileController->deleteFiles($obj->schedule_srl);
 
