@@ -30,7 +30,7 @@
 			</td>
 			<td class="list">
 			{@
-				$list = $getmodel->getScheduleList($check_date);
+				$list = $getmodel->getScheduleList($check_date, $module_info->module_srl);
 			}
 				<div loop="$list => $val" cond="$list">
 					<a href="{getUrl('','mid',$mid,'act','dispScheduleDelete','schedule_srl', $val->schedule_srl)}" cond="$logged_info->is_admin == 'Y'">

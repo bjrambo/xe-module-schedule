@@ -3,6 +3,7 @@ class scheduleView extends schedule
 {
 	function init()
 	{
+		$module_srl = Context::get('module_srl');
 		$oScheduleModel = getModel('schedule');
 		$template_path = sprintf("%sskins/%s/",$this->module_path, $this->module_info->skin);
 		if(!is_dir($template_path)||!$this->module_info->skin)
@@ -13,7 +14,7 @@ class scheduleView extends schedule
 		$this->setTemplatePath($template_path);
 
 		$oLayoutModel = getModel('layout');
-		$module_info = $oScheduleModel->getScheduleInfo();
+		$module_info = $oScheduleModel->getScheduleInfo($module_srl);
 		$layout_info = $oLayoutModel->getLayout($module_info->layout_srl);
 		if($layout_info)
 		{

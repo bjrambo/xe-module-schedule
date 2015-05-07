@@ -38,10 +38,11 @@ class scheduleModel extends schedule
 		return $module_info;
 	}
 
-	function getScheduleList($selected_date)
+	function getScheduleList($selected_date, $module_srl)
 	{
 		$args = new stdClass();
 		$args->selected_date = $selected_date;
+		$args->module_srl = $module_srl;
 		$output = executeQueryArray('schedule.getScheduleList', $args);
 		return $output->data;
 	}

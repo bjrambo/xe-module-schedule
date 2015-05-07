@@ -17,6 +17,8 @@ class scheduleController extends schedule
 			return new Object(-1, 'msg_not_permitted');
 		}
 
+		$module_srl = Context::get('module_srl');
+
 		$oDB = DB::getInstance();
 		$oDB->begin();
 
@@ -30,6 +32,7 @@ class scheduleController extends schedule
 		$args->schedule_content = $obj->content;
 		$args->member_srl = $logged_info->member_srl;
 		$args->regdate = date('YmdHis');
+		$args->module_srl = $this->module_info->module_srl;
 
 		$oScheduleModel = getModel('schedule');
 		$schedule = $oScheduleModel->getSchedule($schedule_srl);

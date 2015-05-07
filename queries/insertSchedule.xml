@@ -9,5 +9,6 @@
 		<column name="schedule_content" var="schedule_content" />
 		<column name="member_srl" var="member_srl" />
 		<column name="regdate" var="regdate" />
+		<column name="module_srl" var="module_srl" />
 	</columns>
 </query>
