@@ -22,9 +22,11 @@ class scheduleModel extends schedule
 		return self::$config;
 	}
 
-	function getScheduleInfo()
+	function getScheduleInfo($module_srl)
 	{
-		$output = executeQuery('schedule.getScheduleInfo');
+		$args = new stdClass();
+		$args->module_srl = $module_srl;
+		$output = executeQuery('schedule.getScheduleInfo', $args);
 		if(!$output->data->module_srl)
 		{
 			return;

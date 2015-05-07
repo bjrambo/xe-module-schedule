@@ -1,9 +1,16 @@
 <ul class="x_nav x_nav-tabs">
+	
+	<li class="x_active"|cond="$act == 'dispScheduleAdminDashboard'">
+		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDashboard')}">대쉬보드</a>
+	</li>
 	<li class="x_active"|cond="$act == 'dispScheduleAdminInsertModule'">
 		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminInsertModule')}">시작</a>
 	</li>
 	<li class="x_active"|cond="$act == 'dispScheduleAdminConfig'">
 		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminConfig')}">설정</a>
+	</li>
+	<li class="x_active" cond="$act == 'dispScheduleAdminDeleteMid'">
+		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDeleteMid')}">모듈 삭제</a>
 	</li>
 </ul>
 <div class="x_page-header">

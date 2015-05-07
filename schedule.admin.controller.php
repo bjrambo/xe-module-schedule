@@ -61,5 +61,24 @@ class scheduleAdminController extends schedule
 			return;
 		}
 	}
+
+	function procScheduleAdminDeleteMid()
+	{
+		$module_srl = Context::get('module_srl');
+
+		$oModuleModel = getModel('module');
+		$module_info = $oModuleModel->getModuleInfoByModuleSrl($module_srl);
+
+		$oModuleController = getController('module');
+		$output = $oModuleController->deleteModule($module_srl);
+
+		if(!$output->toBool())
+		{
+			return $output;
+		}
+
+		$this->setMessage('success_deleted');
+		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDashboard'));
+	}
 }
 /* End of file */

@@ -27,14 +27,17 @@
 	</permissions>
 	<actions>
 		<!-- admin view -->
-		<action name="dispScheduleAdminInsertModule" type="view" menu_name="schedule" menu_index="true" admin_index="true" standalone="true" />
+		<action name="dispScheduleAdminInsertModule" type="view" menu_name="schedule" standalone="true" />
 		<action name="dispScheduleAdminEditorSetting" type="view" />
 		<action name="dispScheduleAdminConfig" type="view" />
 		<action name="dispScheduleAdminGrantInfo" type="view" />
+		<action name="dispScheduleAdminDashboard" type="view" menu_index="true" admin_index="true" />
+		<action name="dispScheduleAdminDeleteMid" type="view" />
 
 		<!-- admin Controller -->
 		<action name="procScheduleAdminInsertMid" type="controller" />
 		<action name="procScheduleAdminInsertConfig" type="controller" />
+		<action name="procScheduleAdminDeleteMid" type="controller" />
 
 		<!-- user view -->
 		<action name="dispScheduleList" type="view" index="true" standalone="true" />

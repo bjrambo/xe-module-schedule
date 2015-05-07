@@ -6,6 +6,6 @@
         <column name="*" />
     </columns>
     <conditions>
-        <condition operation="equal" column="module" default="schedule" />
+        <condition operation="equal" column="module_srl" var="module_srl" />
     </conditions> 
 </query>
