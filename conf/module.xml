@@ -33,11 +33,13 @@
 		<action name="dispScheduleAdminGrantInfo" type="view" />
 		<action name="dispScheduleAdminDashboard" type="view" menu_index="true" admin_index="true" />
 		<action name="dispScheduleAdminDeleteMid" type="view" />
+		<action name="dispScheduleAdminDeleteNoModuleSrlSchedule" type="view" />
 
 		<!-- admin Controller -->
 		<action name="procScheduleAdminInsertMid" type="controller" />
 		<action name="procScheduleAdminInsertConfig" type="controller" />
 		<action name="procScheduleAdminDeleteMid" type="controller" />
+		<action name="procScheduleAdminDeleteNoModuleSrlSchedule" type="controller" />
 
 		<!-- user view -->
 		<action name="dispScheduleList" type="view" index="true" standalone="true" />

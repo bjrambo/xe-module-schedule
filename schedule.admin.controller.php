@@ -80,5 +80,15 @@ class scheduleAdminController extends schedule
 		$this->setMessage('success_deleted');
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDashboard'));
 	}
+
+	function procScheduleAdminDeleteNoModuleSrlSchedule()
+	{
+		$args = new stdClass();
+		$args->module_srl = 1;
+		$output = executeQuery('schedule.deleteNoModuleSrlDeleted', $args);
+
+		$this->setMessage('success_deleted');
+		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDeleteNoModuleSrlSchedule'));
+	}
 }
 /* End of file */

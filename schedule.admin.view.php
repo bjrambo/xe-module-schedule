@@ -225,5 +225,10 @@ class scheduleAdminView extends schedule
 		$this->setTemplateFile('grant_list');
 	}
 
+	function dispScheduleAdminDeleteNoModuleSrlSchedule()
+	{
+
+	}
+
 }
 /* End of file */
