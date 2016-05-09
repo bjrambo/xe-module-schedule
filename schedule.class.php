@@ -1,4 +1,5 @@
 <?php
+require_once(_XE_PATH_.'modules/schedule/schedule.item.php');
 class schedule extends ModuleObject
 {
 	var $triggers = array(

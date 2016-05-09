@@ -1,51 +1,126 @@
-
+{@ $schedule = new scheduleItem(); }
 <table cellspacing="0" class="personalTable">
-<thead>
+	<thead>
 	<tr>
-		<th class="center same_height days">일자</th>
-		<th class="center same_height">일정</th>
-
+		<th class="sunday center same_height" >일</th>
+		<th class="center same_height" >월</th>
+		<th class="center same_height" >화</th>
+		<th class="center same_height" >수</th>
+		<th class="center same_height" >목</th>
+		<th class="center same_height" >금</th>
+		<th class="saturday center same_height">토</th>
 	</tr>
 	</thead>
 	<tbody>
 	{@$_day=1}
 	{@$j=0}
 	<!--@while($_day <= $admin_date_info->day_max)-->
+	<!--@if($j % 7 == 0)-->
+	<tr>
+		<!--@end-->
 		<!--@while($j < $admin_date_info->week_start)-->
+		<td>&nbsp;</td>
 		{@$j++}
 		<!--@end-->
-		<tr><!-- class="today"|cond="sprintf('%s%s%02d',$admin_date_info->_year,$admin_date_info->_month,$_day) == zDate(date('Ymd'),'Ymd')" -->
-			<td class="date days">
-				{@
-					if($j%7==0) $week = $lang->unit_week[Sunday];
-					if($j%7==1) $week = $lang->unit_week[Monday];
-					if($j%7==2) $week = $lang->unit_week[Tuesday];
-					if($j%7==3) $week = $lang->unit_week[Wednesday];
-					if($j%7==4) $week = $lang->unit_week[Thursday];
-					if($j%7==5) $week = $lang->unit_week[Friday];
-					if($j%7==6) $week = $lang->unit_week[Saturday];
-				}
-				{@$check_date = sprintf("%s%s%02d",$admin_date_info->_year,$admin_date_info->_month,$_day)}
-				<a <!--@if($j%7==0)-->class="sunday"<!--@elseif($j%7==6)-->class="saturday"<!--@end--> href="{getUrl('act','dispScheduleInsert','selected_date',zDate(date('YmdHis',mktime(0,0,0,$admin_date_info->_month, $_day, $admin_date_info->_year)),"Ymd"))}">{$_day++} ({$week}) </a>
-			</td>
-			<td class="list">
+		{@
+			if($j%7==0) $week = $lang->unit_week[Sunday];
+			if($j%7==1) $week = $lang->unit_week[Monday];
+			if($j%7==2) $week = $lang->unit_week[Tuesday];
+			if($j%7==3) $week = $lang->unit_week[Wednesday];
+			if($j%7==4) $week = $lang->unit_week[Thursday];
+			if($j%7==5) $week = $lang->unit_week[Friday];
+			if($j%7==6) $week = $lang->unit_week[Saturday];
+		}
+		{@$check_date = sprintf("%s%s%02d",$admin_date_info->_year,$admin_date_info->_month,$_day)}
+		{@
+			$oScheduleModel = getModel('schedule');
+			$lunar_date_arr = $oScheduleModel->solaToLunar(zDate(date('YmdHis',mktime(0,0,0,$admin_date_info->_month, $_day, $admin_date_info->_year)), 'Ymd'));
+			$lunar_date = $lunar_date_arr['month'].$lunar_date_arr['day'];
+
+			if($lunar_date === '0408') $lun_holiyday = '석가탄신일';
+			if($lunar_date === '12029' || $lunar_date === '0102') $lun_holiyday = '설날연휴';
+			if($lunar_date === '0101') $lun_holiyday = '설날';
+			if($lunar_date === '08014' || $lunar_date === '08016') $lun_holiyday = '추석연휴';
+			if($lunar_date === '08015') $lun_holiyday = '추석';
+		}
+
+		{@$holiday = $month.$_day}
+		<td class="today"|cond="sprintf('%s%s%02d',$admin_date_info->_year,$admin_date_info->_month,$_day) == zDate(date('Ymd'),'Ymd')">
+			{@$check_date = sprintf("%s%s%02d",$admin_date_info->_year,$admin_date_info->_month,$_day)}
+			<a class="sunday"|cond="$lun_holiyday || $j%7==0 || $holiday=='031' || $holiday=='011' || $holiday=='055' || $holiday=='066' || $holiday=='0815' || $holiday=='103' || $holiday=='109' || $holiday=='1225'" class="saturday"|cond="$j%7==6" href="{getUrl('act','dispScheduleInsert','selected_date',zDate(date('YmdHis',mktime(0,0,0,$admin_date_info->_month, $_day, $admin_date_info->_year)),'Ymd'))}">{$_day++}</a>
+			<!--@if($lun_holiyday)-->
+			<div>{$lun_holiyday}</div>
+			{@
+			$lun_holiyday = null;
+			}
+			<!--@end-->
+			<div cond="$holiday">
+			<!--@if($holiday=='031')-->
+			삼일절
+			<!--@elseif($holiday=='011')-->
+			신정
+			<!--@elseif($holiday=='055')-->
+			어린이날
+			<!--@elseif($holiday=='066')-->
+			현충일
+			<!--@elseif($holiday=='0815')-->
+			광복절
+			<!--@elseif($holiday=='103')-->
+			개천절
+			<!--@elseif($holiday=='109')-->
+			한글날
+			<!--@elseif($holiday=='1225')-->
+			크리스마스
+			<!--@end-->
+			</div>
 			{@
 				$list = $getmodel->getScheduleList($check_date, $module_info->module_srl);
 			}
-				<div loop="$list => $val" cond="$list">
-					<a href="{getUrl('','mid',$mid,'act','dispScheduleDelete','schedule_srl', $val->schedule_srl)}" cond="$logged_info->is_admin == 'Y'">
+
+			<div loop="$list => $val" cond="$list" >
+				<a href="{getUrl('','mid',$mid,'act','dispScheduleDelete','schedule_srl', $val->schedule_srl)}" cond="$logged_info->is_admin == 'Y'">
 					<i class="xi-trash"></i></a>
-					<a href="{getUrl('','mid',$mid,'act','dispScheduleInsert','schedule_srl', $val->schedule_srl)}" cond="$logged_info->is_admin == 'Y'"><i class="xi-brush-point"></i></a>
-					<a href="{getUrl('','mid',$mid,'act','dispScheduleSchedule','schedule_srl', $val->schedule_srl)}" cond="$config->viewconfig == 'Y'">
-						<span class="list"> {$val->schedule_name}</span>
-					</a>
-					<span cond="$config->viewconfig != 'Y'">
+				<a href="{getUrl('','mid',$mid,'act','dispScheduleInsert','schedule_srl', $val->schedule_srl)}" cond="$logged_info->is_admin == 'Y'"><i class="xi-brush-point"></i></a>
+				<a href="{getUrl('','mid',$mid,'act','dispScheduleSchedule','schedule_srl', $val->schedule_srl)}" cond="$config->viewconfig == 'Y'" class="hover-list" data-srl="{$val->schdule_srl}">
+					<span class="list"> {$val->schedule_name}</span>
+				</a>
+					<span cond="$config->viewconfig != 'Y'" class="hover-list">
 						<span class="list"> {$val->schedule_name}</span>
 					</span>
+				<div class="file-absulute" style="display:none" file-srl="{$val->schdule_srl}">
+					<img src="{$schedule->scheduleGetThumbnail($val->schedule_srl, 350, 250)}" alt="{$val->schedule_name}" />
 				</div>
-			</td>
-		</tr>
+			</div>
+		</td>
+		<!--@if($_day-1 == $admin_date_info->day_max)-->
+		<!--@while($j %7 < 6)-->
+		<td>&nbsp;</td>
 		{@$j++}
+		<!--@end-->
+		<!--@end-->
+		<!--@if($j % 7 == 6)-->
+	</tr>
+	<!--@end-->
+	{@$j++}
 	<!--@end-->
 	</tbody>
 </table>
+<script>
+	jQuery(document).ready(function($){
+		$('.hover-list').hover(
+				function () {
+					var $this = $(this);
+					var $file = $this.next('.file-absulute');
+
+					$file.show();
+
+				},
+				function () {
+					var $this = $(this);
+					var $file = $this.next('.file-absulute');
+
+					$file.hide();
+				}
+		);
+	});
+</script>

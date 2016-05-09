@@ -14,7 +14,14 @@
 .personalTable tr.bg0{ background:#f8f8f8;}
 .personalTable tr.bg1{ background:#f8f8f8;}
 .personalTable th,
-.personalTable td{ border:0; padding:2px 5px 0px 5px; border-right:1px solid #f0f0f0; text-align:left;  }
+.personalTable td{
+	border:0;
+	padding:2px 5px 0px 5px;
+	height:100px;
+	vertical-align: top;
+	border-right:1px solid #f0f0f0;
+	text-align:left;
+}
 .personalTable td:hover {background:#f8f8f8; }
 .personalTable th{ background:#f8f8f8; border-top:1px solid #999;border-bottom:1px solid #cdcdcd; padding:5px 0; }
 .personalTable td{ border-bottom:1px solid #f0f0f0; font-weight:normal; background:#f8f8f8;  line-height:15px; padding:5px 0; }
@@ -32,7 +39,7 @@
 .personalTable .saturday a { text-decoration:none; color:#36C;}
 .personalTable .center { text-align:center; }
 .personalTable .same_height { height:auto; font-weight:bold; }
-.personalTable .same_height.days { width:50px; }
+.personalTable .same_height.days { width:90px; }
 .personalTable .check { margin:0; text-align:center; font-weight:bold; padding:0; border:0;}
 .personalTable td.stamp { background:#fff;}
 .personalTable td.today{
@@ -219,5 +226,14 @@ background: linear-gradient(to bottom,#FFF 0%,#F9F9F9 100%);
 	font-weight: bold;
 }
 .member_info .member img {
+	display:none;
+}
+
+.file-absulute {
+	padding:2px;
+	border:1px solid #DCDCDC;
+	border-radius:2px;
+	background:#fff;
+	position:absolute;
 	display:none;
 }
