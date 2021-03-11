@@ -1,0 +1,13 @@
+<table name="schedule_recur">
+	<column name="schedule_srl" type="number" size="11" notnull="notnull" primary_key="primary_key" index="idx_schedule_srl" />
+	<column name="recur_type" type="varchar" size="8" notnull="notnull" />
+	<column name="recur_regular" type="varchar" size="8" />
+	<column name="week_order" type="varchar" size="40" />
+	<column name="weekdays" type="varchar" size="90" />
+	<column name="recur_cycle" type="number" size="3" notnull="notnull" />
+	<column name="recur_unit" type="varchar" size="20" notnull="notnull" />
+	<column name="recur_freq" type="number" size="4" default="0" />
+	<column name="stop_date" type="varchar" size="8" />
+	<column name="exception_type" type="varchar" size="30" />
+	<column name="exception_option" type="varchar" size="10" />
+</table>
