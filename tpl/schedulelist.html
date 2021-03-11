@@ -1,0 +1,199 @@
+<script>
+xe.lang.status_standby = '{$lang->status_list["STANDBY"]}';
+xe.lang.status_public = '{$lang->status_list["PUBLIC"]}';
+xe.lang.msg_empty_search_target = '{$lang->msg_empty_search_target}';
+xe.lang.msg_empty_search_keyword = '{$lang->msg_empty_search_keyword}';
+</script>
+<load target="filter/manage_checked_schedule.xml" />
+<load target="js/schedule.js" />
+<include target="./_header.html" />
+
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == 'modules/schedule/tpl/schedulelist/1'" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+	<p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+<form id="fo_list" action="./" method="get" no-error-return-url="true">
+	<input type="hidden" name="module" value="schedule" />
+	<input type="hidden" name="page" value="{$page}" />
+	<table id="scheduleListTable" class="x_table x_table-striped x_table-hover dsTg">
+		<caption>
+		<!--@if($search_keyword)-->
+			<a href="{getUrl('', 'module', 'admin', 'module_srl', $module_srl, 'act', $act)}">{$lang->cmd_reset}</a>
+			<i>|</i>
+			<a cond="$status" href="{getUrl('page', '', 'status', '')}">{$lang->all}</a>
+			<a cond="!$status" href="{getUrl('page', '')}" class="active">{$lang->all}({number_format($total_count)})</a>
+		<!--@else-->
+			<a cond="$status" href="{getUrl('', 'module', 'admin', 'module_srl', $module_srl, 'act', $act)}">{$lang->all}</a>
+			<a cond="!$status" href="{getUrl('', 'module', 'admin', 'module_srl', $module_srl, 'act', $act)}" class="active">{$lang->all}({number_format($total_count)})</a>
+		<!--@endif-->
+		<!--@foreach($status_list as $key => $val)-->
+			<i>|</i>
+			<a href="{getUrl('page', '', 'status', $key)}" class="active"|cond="$status == $key">{$status_list[$key]}<block cond="$status == $key">({number_format($total_count)})</block></a>
+		<!--@endforeach-->
+
+			<div class="x_btn-group x_pull-right">
+				<a href="#manageForm" class="x_btn modalAnchor" data-value="STANDBY">{$status_list['STANDBY']}</a>
+				<a href="#manageForm" class="x_btn modalAnchor" data-value="PUBLIC">{$status_list['PUBLIC']}</a>
+				<a href="#manageForm" class="x_btn modalAnchor" data-value="delete">{$lang->delete}</a>
+			</div>		
+		</caption>
+		<thead>
+			<tr>
+				<th scope="col" class="nowr">{$lang->no}</th>
+				<th scope="col" class="title">{$lang->title}</th>
+				<th scope="col" class="nowr">{$lang->writer}</th>
+				<th scope="col" class="nowr">{$lang->date}</th>
+				<th scope="col" class="nowr">{$lang->status}</th>
+				<th scope="col"><input type="checkbox" title="Check All" /></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr loop="$schedule_list => $no, $oSchedule">
+				<td class="nowr">{$no}</td>
+				<td class="title">
+					<a href="{getUrl('', 'mid', $oSchedule->getScheduleMid(), 'schedule_srl', $oSchedule->schedule_srl)}" target="_blank"><!--@if(trim($oSchedule->getTitleText()) !== '')-->{escape($oSchedule->getTitleText(), false)}<!--@else--><em>{$lang->no_title_document}</em><!--@end--></a>
+					<span cond="!$module_srl && isset($module_list[$oSchedule->get('module_srl')])">
+						- <a href="{getUrl('', 'mid', $module_list[$oSchedule->get('module_srl')]->mid)}" target="_blank">{$module_list[$oSchedule->get('module_srl')]->browser_title}</a>
+					</span>
+				</td>
+				<td class="nowr">
+					<span cond="$oSchedule->get('member_srl') == 0">{$oSchedule->get('nick_name')}</span>
+					<a href="#popup_menu_area" class="member_{$oSchedule->get('member_srl')}" cond="$oSchedule->get('member_srl') > 0">{$oSchedule->get('nick_name')}</a>
+				</td>
+				<td class="nowr">
+					<span>{zdate($oSchedule->get('regdate'), 'Y-m-d H:i:s')}</span>
+				</td>
+				<td class="nowr">{$status_list[$oSchedule->get('status')]}</td>
+				<td><input type="checkbox" name="cart" value="{$oSchedule->schedule_srl}" /></td>
+			</tr>
+		</tbody>
+	</table>
+	<div class="x_clearfix">
+		<div class="x_btn-group x_pull-right">
+				<a href="#manageForm" class="x_btn modalAnchor" data-value="STANDBY">{$status_list['STANDBY']}</a>
+				<a href="#manageForm" class="x_btn modalAnchor" data-value="PUBLIC">{$status_list['PUBLIC']}</a>
+				<a href="#manageForm" class="x_btn modalAnchor" data-value="delete">{$lang->delete}</a>
+		</div>
+	</div>
+</form>
+
+<form action="./" class="x_pagination x_pull-left" style="margin:-36px 0 0 0">
+	<input type="hidden" name="error_return_url" value="" />
+	<input type="hidden" name="module" value="{$module}" />
+	<input type="hidden" name="act" value="{$act}" />
+	<input type="hidden" name="status" value="{$status}" />
+	<input cond="$search_keyword" type="hidden" name="search_keyword" value="{$search_keyword}" />
+	<input cond="$search_target" type="hidden" name="search_target" value="{$search_target}" />
+	<ul>
+		<li class="x_disabled"|cond="!$page || $page == 1"><a href="{getUrl('page', '')}">&laquo; {$lang->first_page}</a></li>
+		<block cond="$page_navigation->first_page != 1 && $page_navigation->first_page + $page_navigation->page_count > $page_navigation->last_page - 1 && $page_navigation->page_count != $page_navigation->total_page">
+		{@$isGoTo = true}
+		<li>
+			<a href="#goTo" data-toggle title="{$lang->cmd_go_to_page}">&hellip;</a>
+			<span cond="$isGoTo" id="goTo" class="x_input-append">
+				<input type="number" min="1" max="{$page_navigation->last_page}" required name="page" title="{$lang->cmd_go_to_page}" />
+				<button type="submit" class="x_add-on">Go</button>
+			</span>
+		</li>
+		</block>
+
+		<!--@while($page_no = $page_navigation->getNextPage())-->
+		{@$last_page = $page_no}
+		<li class="x_active"|cond="$page_no == $page"><a  href="{getUrl('page', $page_no)}">{$page_no}</a></li>
+		<!--@end-->
+
+		<block cond="$last_page != $page_navigation->last_page && $last_page + 1 != $page_navigation->last_page">
+		{@$isGoTo = true}
+		<li>
+			<a href="#goTo" data-toggle title="{$lang->cmd_go_to_page}">&hellip;</a>
+			<span cond="$isGoTo" id="goTo" class="x_input-append">
+				<input type="number" min="1" max="{$page_navigation->last_page}" required name="page" title="{$lang->cmd_go_to_page}" />
+				<button type="submit" class="x_add-on">Go</button>
+			</span>
+		</li>
+		</block>
+		<li class="x_disabled"|cond="$page == $page_navigation->last_page"><a href="{getUrl('page', $page_navigation->last_page)}" title="{$page_navigation->last_page}">{$lang->last_page} &raquo;</a></li>
+	</ul>
+</form>
+
+<form action="./" method="get" onsubmit="return checkSearch(this);" class="search center x_input-append x_clearfix">
+	<input type="hidden" name="module" value="{$module}" />
+	<input type="hidden" name="act" value="{$act}" />
+	<input type="hidden" name="status" value="{$status}" />
+	<input type="hidden" name="module_srl" value="{$module_srl}" />
+	<input type="hidden" name="error_return_url" value="" />
+	<select name="search_target" title="{$lang->search_target}" style="margin-right:4px">
+		<option loop="$search_option => $key, $val" value="{$key}" selected="selected"|cond="$search_target==$key">{$val}</option>
+	</select>
+	<input type="search" name="search_keyword" value="{escape($search_keyword, false)}" title="{$lang->cmd_search}" />
+	<button type="submit" class="x_btn x_btn-inverse">{$lang->cmd_search}</button>
+	<a href="{getUrl('', 'module', $module, 'act', $act)}" class="x_btn">{$lang->cmd_cancel}</a>
+</form>
+
+<form action="./" method="post" class="x_modal" id="manageForm">
+	<input type="hidden" name="module" value="schedule" />
+	<input type="hidden" name="act" value="procScheduleManageCheckedSchedule" />
+	<input type="hidden" name="type" value="" />
+	<input type="hidden" name="module_srl" value="$module_srl" />
+	<input type="hidden" name="success_return_url" value="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminScheduleList', 'module_srl', $module_srl, 'status', $status, 'search_target', $search_target, 'search_keyword', $search_keyword, 'page', $page)}" />
+	<input type="hidden" name="xe_validator_id" value="modules/schedule/tpl/schedulelist/1" />
+	<div class="x_modal-header">
+		<h1>{$lang->schedule_manager}: <span class="_sub"></span></h1>
+	</div>
+	<div class="x_modal-body">
+		<section class="moveList">
+			<table width="100%" id="scheduleManageListTable" class="x_table x_table-striped x_table-hover">
+				<caption><strong>{$lang->selected_schedule} <span id="selectedScheduleCount"></span></strong></caption>
+				<thead>
+					<tr>
+						<th scope="col" class="title">{$lang->title}</th>
+						<th scope="col" class="nowr">{$lang->writer}</th>
+						<th scope="col" class="nowr">{$lang->status}</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</section>
+	</div>
+	<div class="x_modal-footer">
+		<button type="submit" name="type" value="" class="x_btn x_btn-inverse x_pull-right">{$lang->cmd_confirm}</button>
+	</div>
+</form>
+
+<script>
+jQuery(function($){
+	// Modal anchor activation
+	var $docTable = $('#scheduleListTable');
+	$docTable.find(':checkbox').change(function(){
+		var $modalAnchor = $('a[data-value]');
+		if($docTable.find('tbody :checked').length == 0){
+			$modalAnchor.removeAttr('href').addClass('x_disabled');
+		} else {
+			$modalAnchor.attr('href','#manageForm').removeClass('x_disabled');
+		}
+	}).change();
+	// Button action
+	$('a[data-value]').bind('before-open.mw', function(){
+		if($docTable.find('tbody :checked').length == 0){
+			$('body').css('overflow','auto');
+			alert('{$lang->msg_not_selected_schedule}');
+			return false;
+		} else {
+			var $this = $(this);
+			var $manageForm = $('#manageForm');
+			var $modalBody = $manageForm.find('.x_modal-body');
+			var thisValue = $this.attr('data-value');
+			var thisText = $this.text();
+
+			getScheduleList();
+			$manageForm.find('.x_modal-header ._sub').text(thisText).end().find('[type="submit"]').val(thisValue).text(thisText);
+
+			if ( thisValue == 'public' ) {
+			} else if ( thisValue == 'standby' ) {
+			} else if ( thisValue == 'delete' ) {
+			}
+		}
+	});
+});
+</script>

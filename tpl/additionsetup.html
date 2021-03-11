@@ -1,0 +1,120 @@
+<include target="./_header.html" />
+<load target="../../module/tpl/js/multi_order.js" cond="$module_info->use_list == 'Y'" />
+
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == 'modules/schedule/tpl/additionsetup/1'" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+	<p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+<form ruleset="additionsetup" class="x_form-horizontal" action="{Context::getRequestUri()}" method="post" cond="$module_info->use_list == 'Y'">
+	<input type="hidden" name="module" value="schedule" />
+	<input type="hidden" name="module_srl" value="{$module_info->module_srl}" />
+	<input type="hidden" name="mid" value="{$module_info->mid}" />
+	<input cond="$logged_info->is_admin != 'Y'" type="hidden" name="mid" value="{$module_info->mid}" />
+	<input type="hidden" name="act" value="procScheduleAdminSetList" />
+	<input type="hidden" name="success_return_url" value="{getRequestUriByServerEnviroment()}" />
+	<input type="hidden" name="page" value="{$page}" />
+	<input type="hidden" name="xe_validator_id" value="modules/schedule/tpl/additionsetup/1" />
+
+	<section class="section">
+		<h1>{$lang->cmd_list_setting}</h1>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{$lang->cmd_list_items}</label>
+			<div class="x_controls">
+				{@$list = array_keys($list_config)}
+				<input type="hidden" name="list" value="{implode(',', $list)}" />
+				<p style="padding:3px 0 0 0">{$lang->about_list_config}</p>
+				<div style="display:inline-block">
+					<select class="multiorder_show" size="8" multiple="multiple" style="width:220px;vertical-align:top;margin-bottom:8px">
+						<option loop="$default_list_config => $key, $val" cond="!$list_config[$key]" value="{$key}">{$val}</option>
+					</select><br />
+					<button type="button" class="x_btn multiorder_add" style="vertical-align:top">{$lang->cmd_insert}</button>
+				</div>
+				<div style="display:inline-block">
+					<select class="multiorder_selected" size="8" multiple="multiple" style="width:220px;vertical-align:top;margin-bottom:8px">
+						<option loop="$list_config => $key, $val" value="{$key}">{$val}</option>
+					</select><br />
+					<span class="x_btn-group">
+						<button type="button" class="x_btn multiorder_up" style="vertical-align:top">{$lang->cmd_move_up}</button>
+						<button type="button" class="x_btn multiorder_down" style="vertical-align:top">{$lang->cmd_move_down}</button>
+						<button type="button" class="x_btn multiorder_del" style="vertical-align:top">{$lang->cmd_delete}</button>
+					</span>
+				</div>
+				<script>
+					xe.registerApp(new xe.MultiOrderManager('list'));
+				</script>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label">{$lang->order_type}</label>
+			<div class="x_controls">
+				<select name="order_target" id="order_target" title="{$lang->order_target}">
+					<option loop="$order_target=> $key, $val" value="{$key}" selected="selected"|cond="$module_info->order_target== $key">{$val}</option>
+					<block cond="$extra_order_target">
+					<option loop="$extra_order_target=> $key, $val" value="{$key}" selected="selected"|cond="$module_info->order_target== $key">{$val}</option>
+					</block>
+				</select>
+				<select name="order_type" id="order_type" title="{$lang->order_type}">
+					<option value="asc" selected="selected"|cond="$module_info->order_type != 'desc'">{$lang->order_asc}</option>
+					<option value="desc" selected="selected"|cond="$module_info->order_type == 'desc'">{$lang->order_desc}</option>
+				</select>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="list_count">{$lang->list_count}</label>
+			<div class="x_controls">
+				<input type="text" name="list_count" id="list_count" value="{$module_info->list_count?$module_info->list_count:20}" style="width:30px" />
+				<p class="x_help-inline">{$lang->about_list_count}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="search_list_count">{$lang->search_list_count}</label>
+			<div class="x_controls">
+				<input type="text" name="search_list_count" id="search_list_count" value="{$module_info->search_list_count?$module_info->search_list_count:20}" style="width:30px" />
+				<p class="x_help-inline">{$lang->about_search_list_count}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="page_count">{$lang->page_count}</label>
+			<div class="x_controls">
+				<input type="text" name="page_count" id="page_count" value="{$module_info->page_count?$module_info->page_count:10}" style="width:30px" />
+				<p class="x_help-inline">{$lang->about_page_count}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="mobile_list_count">{$lang->mobile_list_count}</label>
+			<div class="x_controls">
+				<input type="text" name="mobile_list_count" id="mobile_list_count" value="{$module_info->mobile_list_count?$module_info->mobile_list_count:10}" style="width:30px" />
+				<p class="x_help-inline">{$lang->about_list_count}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="mobile_search_list_count">{$lang->mobile_search_list_count}</label>
+			<div class="x_controls">
+				<input type="text" name="mobile_search_list_count" id="mobile_search_list_count" value="{$module_info->mobile_search_list_count?$module_info->mobile_search_list_count:10}" style="width:30px" />
+				<p class="x_help-inline">{$lang->about_search_list_count}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="mobile_page_count">{$lang->mobile_page_count}</label>
+			<div class="x_controls">
+				<input type="text" name="mobile_page_count" id="mobile_page_count" value="{$module_info->mobile_page_count?$module_info->mobile_page_count:5}" style="width:30px" />
+				<p class="x_help-inline">{$lang->about_page_count}</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="x_clearfix btnArea">
+		<div class="x_pull-right">
+			<button class="x_btn x_btn-primary" type="submit">{$lang->cmd_registration}</button>
+		</div>
+	</div>
+</form>
+
+<div class="additional_setup">{$setup_content}</div>
+
+<style>
+.additional_setup .section:first-of-type .x_control-group:nth-of-type(n+3) {
+	display: none;
+}
+</style>

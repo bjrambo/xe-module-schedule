@@ -1,0 +1,21 @@
+<filter name="insert" module="schedule" act="procScheduleInsertSchedule">
+	<form>
+		<node target="category_srl" required="true" />
+		<node target="title" required="true" minlength="1" maxlength="250" />
+		<node target="start_date" required="true" minlength="8" maxlength="8" />
+		<node target="start_time" required="true" minlength="4" maxlength="4" />
+		<node target="end_date" required="true" minlength="8" maxlength="8" />
+		<node target="end_time" required="true" minlength="4" maxlength="4" />
+		<node target="nick_name" required="true" maxlength="20"/>
+		<node target="email_address" required="true" maxlength="250" filter="email" />
+		<node target="password" required="true" />
+	</form>
+	<response callback_func="completeScheduleInserted">
+		<tag name="error" />
+		<tag name="message" />
+		<tag name="redirect_url" />
+		<tag name="mid" />
+		<tag name="schedule_srl" />
+		<tag name="category_srl" />
+	</response>
+</filter>
