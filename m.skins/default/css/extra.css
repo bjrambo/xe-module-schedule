@@ -1,0 +1,391 @@
+/* View */
+
+.atc {
+	position: relative;
+	background-color: #fff;
+	border: 1px solid #e5e5e5;
+}
+.atc.has_list {
+	margin-bottom: 24px;
+}
+.atc .clearfix:before,
+.atc .clearfix:after {
+	content: " ";
+	display: table;
+}
+
+.atc_header .title_wrap {
+	position: relative;
+	height: 88px;
+	border-bottom: 1px solid #f2f2f2;
+}
+.atc_header a {
+	color: #6e8a98;
+	text-decoration: none;
+}
+.atc_header h1 {
+	position: absolute;
+	left: 24px;
+	top: 50%;
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	padding-right: 24px;
+	font-size: 18px;
+	line-height: 140%;
+	word-break: break-all;
+}
+.atc_header .atc_ctg {
+	font-size: 14px;
+}
+.atc_info {
+	padding: 12px 16px 12px 24px;
+	border-bottom: 1px solid #f2f2f2;
+	font-size: 14px;
+}
+.atc_info ul {
+	display: inline-block;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.atc_info li {
+	display: inline-block;
+	vertical-align: middle;
+	color: #555;
+	font-size: 12px;
+}
+.atc_info a {
+	color: #99c;
+}
+.atc_info .text_en {
+	padding: 4px 12px;
+	background-color: #f7f7f7;
+	border: 1px solid #ddd;
+	border-radius: 2px;
+	font-size: 13px;
+	line-height: 20px;
+}
+.atc_info .atc_recur_desc {
+	display: inline-block;
+	margin-left: 6px;
+	font-size: 12px;
+	color: #666;
+}
+#disp_recur_type_regular,
+#disp_recur_type_weekday,
+#disp_recur_type_lunar,
+#disp_recur_type_manual,
+#disp_recur_freq,
+#disp_stop_date,
+#disp_exception_type,
+#disp_exception_option {
+	word-break: keep-all;
+}
+.atc_body {
+	padding: 0 24px;
+}
+.xe_content {
+	margin: 0 -24px;
+	padding: 24px;
+	border-top: 1px solid #f2f2f2;
+	color: #333;
+}
+
+/* Delete */
+
+.atc_confirm {
+	margin: 20px auto;
+	text-align: center;
+	font-size: 18px;
+}
+.atc_command {
+	margin: 24px auto;
+	text-align: center;
+}
+.atc_command .g-recaptcha {
+	display: table;
+	margin: 0 auto 12px;
+}
+
+/* Input Password */
+.atc_password {
+	text-align: center;
+}
+.atc_password .atc_input_pwd {
+	display: inline-block;
+	height: 32px;
+	line-height: 32px;
+	padding: 0 12px;
+	background-color: #f7f7f7;
+	border: 1px solid #e5e5e5;
+	box-sizing: border-box;
+	border-radius: 2px;
+	vertical-align: middle;
+}
+
+
+/* Insert */
+
+.is_insert h1 {
+	width: calc(100% - 50px);
+}
+.is_insert input,
+.is_insert select,
+.is_insert label {
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	color: #333;
+	border-width: 1px;
+	border-radius: 0;
+	border-collapse: collapse;
+	box-sizing: border-box;
+}
+.is_insert input,
+.is_insert select {
+	border: none;
+	outline: none;
+}
+.is_insert select.atc_ctg {
+	transform: translate(-4px, -1px);
+	background-color: transparent;
+	color: #6e8a98;
+	cursor: pointer;
+}
+
+.is_insert label {
+	margin-right: 4px;
+	height: 16px;
+	cursor: pointer;
+}
+.is_insert input[type="checkbox"],
+.is_insert input[type="radio"] {
+	vertical-align: middle;
+	cursor: pointer;
+}
+.is_insert input[type="checkbox"] + span,
+.is_insert input[type="radio"] + span {
+	display: inline-block;
+	vertical-align: middle;
+}
+.is_insert .atc_body {
+	padding-bottom: 0;
+}
+.is_insert input.insert_title {
+	display: block;
+	width: 100%;
+	font-size: 18px;
+	color: #333333;
+	word-break: break-all;
+}
+.is_insert input.date_for_allday,
+.is_insert input.insert_start,
+.is_insert input.insert_end {
+	display: inline-block;
+	width: 120px;
+	height: 16px;
+	padding: 0;
+	background-color: transparent;
+	font-size: 14px;
+	text-align: center;
+}
+.is_insert input.date_for_allday {
+	font-weight: bold;
+}
+.is_insert input.date_for_allday.hidden {
+	display: none;
+}
+.is_insert input.insert_start[disabled],
+.is_insert input.insert_end[disabled],
+.is_insert input.date_for_allday:not(.hidden) ~ span {
+	display: none;
+}
+.is_insert input.insert_place {
+	width: 100%;
+}
+.is_insert input.insert_title_color {
+	width: 92px;
+	height: 20px;
+}
+.is_insert input.insert_title_color + .jPicker .Icon {
+	transform: translateX(-24px);
+}
+
+.is_insert .toggle_btn {
+	position: relative;
+	display: inline-block;
+	margin: 2px 8px 2px 0;
+	width: 48px;
+	height: 24px;
+	border-radius: 16px;
+	vertical-align: middle;
+}
+.is_insert .toggle_btn input[type="checkbox"] {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	margin: 0;
+	cursor: pointer;
+	opacity: 0;
+	z-index: 2;
+}
+.is_insert .toggle_btn strong {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: #f7f7f7;
+	border: 1px solid #ccc;
+	border-radius: 20px;
+	overflow: hidden;
+	transition: 0.8s ease border;
+}
+.is_insert .toggle_btn strong:before {
+	content: '\2715';
+	position: absolute;
+	top: 1px;
+	left: 10px;
+	width: 18px;
+	height: 18px;
+	background-color: #ddd;
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	color: #fff;
+	font-size: 12px;
+	line-height: 18px;
+	text-align: center;
+	transform: translate(-8px, 0px);
+	transition: 0.4s ease transform, 0.6s ease width, 0.6s ease margin-left, 0.8s ease background-color, 0.8s ease border, 0.8s ease content;
+}
+.is_insert .toggle_btn input[type="checkbox"]:active + strong:before {
+	width: 40px;
+	border-radius: 20px;
+}
+.is_insert .toggle_btn input[type="checkbox"]:checked:active + strong:before {
+	margin-left: -22px;
+}
+.is_insert .toggle_btn input[type="checkbox"]:checked + strong {
+	background-color: #eee;
+	border-color: #ccc;
+}
+.is_insert .toggle_btn input[type="checkbox"]:checked + strong:before {
+	content: '\2713';
+	background-color: #aaa;
+	border: 1px solid #aaa;
+	transform: translate(14px,0px);
+}
+
+.is_insert .toggle_desc {
+	display: inline-block;
+	margin: 0;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+	vertical-align: middle;
+	opacity: 0;
+	transition: 0.6s ease opacity;
+}
+.is_insert .toggle_desc.shown {
+	margin: 2px 0;
+	width: auto;
+	height: auto;
+	opacity: 1;
+}
+.is_insert .toggle_desc .toggle_desc_content {
+	font-size: 0;
+}
+.is_insert .toggle_desc .toggle_desc_content span {
+	font-size: 12px;
+}
+
+
+/* Vue DateTime */ 
+
+#insert_start,
+#insert_end {
+	display: inline-block;
+}
+.theme-gray .vdatetime-popup__header,
+.theme-gray .vdatetime-calendar__month__day--selected > span > span,
+.theme-gray .vdatetime-calendar__month__day--selected:hover > span > span {
+	background: #666;
+}
+.theme-gray .vdatetime-year-picker__item--selected,
+.theme-gray .vdatetime-month-picker__item--selected,
+.theme-gray .vdatetime-time-picker__item--selected,
+.theme-gray .vdatetime-popup__actions__button {
+	color: #666;
+}
+.theme-gray + .reset_stop_date {
+	position: absolute;
+	margin: auto;
+	top: 0;
+	right: 80px;
+	bottom: 0;
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+	color: #ccc;
+	cursor: pointer;
+}
+
+
+/* Extra Table */
+
+.atc_ex {
+	position: relative;
+	border-collapse: collapse;
+	width: calc(100% + 48px);
+	margin: 0 -24px;
+	color: #333;
+}
+.atc_ex tr {
+	border-bottom: 1px solid #f2f2f2;
+}
+.atc_ex tr:last-of-type {
+	border-bottom: none;
+}
+.atc_ex th {
+	width: 80px;
+	padding: 8px 24px;
+	text-align: left;
+	font-size: 12px;
+	font-weight: normal;
+	white-space: nowrap;
+	border-right: 1px solid #f2f2f2;
+	background-color: #f7f7f7;
+}
+.atc_ex td {
+	padding: 8px 12px;
+	word-break: break-all;
+	font-size: 0;
+}
+.atc_ex td * {
+	font-size: 12px;
+}
+.atc_ex img.atc_prof {
+	margin-right: 4px;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	vertical-align: middle;
+}
+.atc_ex a {
+	color: #99c;
+	text-decoration: none;
+	vertical-align: middle;
+}
+.atc_ex .jPicker {
+	vertical-align: middle;
+}
+.atc_editor {
+	width: calc(100% + 48px);
+	margin: 0px -24px -10px;
+	border-collapse: collapse;
+}

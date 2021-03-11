@@ -1,0 +1,113 @@
+<include target="_header.html" />
+
+<div class="schedule">
+
+	<div class="navi">
+		<div class="navi_fl" cond="$is_mobile && $module_info->hide_category != 'Y' && $category_list">
+			<a class="navi_btn btn_search" href="#category"><i class="xi xi-align-justify"></i> {$index->getCurrentCategoryText()}</a>
+		</div>
+		<div class="ctg_list" cond="!$is_mobile && $module_info->hide_category != 'Y' && $category_list">
+			<ul>
+				<li class="active"|cond="!$category">
+					<a href="{getUrl('act', '', 'category', '', 'page', '')}"><span class="ctg_check" cond="!$category"><i class="xi xi-check"></i></span> {$lang->total}</a>
+				</li>
+				<li loop="$category_list => $srl, $val" class="active"|cond="$category == $srl" cond="!$val->depth">
+					<a href="{getUrl('category', $srl, 'page', '')}" style="color:{$val->color}"|cond="$val->color && $val->color != 'transparent'"><span class="ctg_check" cond="$category == $srl || $val->expand"><i class="xi xi-check"></i></span> {$val->title} <span class="ctg_drop" cond="$val->child_count"><i class="xi xi-angle-down"></i></span></a>
+					<ul cond="$val->child_count">
+						<li loop="$val->childs => $v" class="active"|cond="$category == $v">
+							{@ $item = $category_list[$v]; }
+							<a href="{getUrl('category', $v, 'page', '')}" style="color:{$item->color}"|cond="$item->color && $item->color != 'transparent'"><span class="ctg_check" cond="$category == $v"><i class="xi xi-check"></i></span> {$item->title}</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<div class="navi_fr" cond="$search_keyword">
+			<a class="navi_btn" href="{getUrl('search_target', '', 'search_keyword', '')}"><i class="xi xi-rotate-left"></i> {$lang->cmd_search} {$lang->cmd_reset}</a>
+		</div>
+	</div>
+
+
+	<div class="schedule_list">
+		<table class="tbl_scdl_list">
+			<thead>
+			<!-- LIST HEADER -->
+				<tr>
+					<th loop="$list_config => $key, $val" scope="col">
+					<!--@if(in_array($key, $order_target) || $key == 'no')-->
+						<a href="{getUrl('sort_index', $key, 'order_type', $order_type)}">
+							{$val}<span cond="$sort_index == $key && $order_type">{$order_type == 'desc' ? '<i class="xi xi-caret-up"></i>' : '<i class="xi xi-caret-down"></i>'}</span>
+						</a>
+					<!--@else-->
+						<span>{$val}</span>
+					<!--@end-->
+					</th>
+				</tr>
+			<!-- LIST HEADER -->
+			</thead>
+			<tbody>
+			<!-- LIST -->
+				<tr cond="!$schedule_list">
+					<td colspan="{count($list_config)}">{$search_keyword ? $lang->no_schedule_searched : $lang->no_schedule}</td>
+				</tr>
+				<tr cond="$schedule_list" loop="$schedule_list => $no, $schedule" onclick="location.href = '{getUrl('schedule_srl', $schedule->schedule_srl)}'">
+					<block loop="$list_config => $key, $val">
+					<td cond="$key == 'no'">{$no}</td>
+					<td class="ta_bold" cond="$key == 'start_date'">{$schedule->getStartDate('Y년 n월 j일')}</td>
+					<td class="ta_bold ta_max" cond="$key == 'title'">{$schedule->getTitle()}</td>
+					<td cond="$key == 'category_srl'">{$schedule->getCurrentCategoryHTML()}</td>
+					<td class="ta_max" cond="$key == 'selected_date'">{$schedule->getSelectedDate('Y년 n월 j일')}</td>
+					<td class="ta_max" cond="$key == 'recur'"><div>{$schedule->get('is_recurrence') == 'Y' ? $schedule->getRecurDescHTML() : ''}</td>
+					<td cond="$key == 'place'">{$schedule->getPlace()}</td>
+					<td cond="$key == 'nick_name'">{$schedule->getNickName()}</td>
+					<td cond="$key == 'regdate'">{$schedule->getRegdate('Y-m-d')}</td>
+					<td cond="$key == 'status'">{$status_list[$schedule->getStatus()]}</td>
+					<td cond="$key == 'thumbnail'">
+						<img src="{$schedule->getThumbnail(80, 45, 'fill')}" cond="$schedule->thumbnailExists()" />
+						<span class="bd_no_img" cond="!$schedule->thumbnailExists()">{lang('none_image')}</span>
+					</td>
+					</block>
+				</tr>
+			<!-- LIST -->
+			</tbody>
+		</table>
+	</div>
+
+	<!-- PAGINATE -->
+	<div class="scdl_paginate" cond="$schedule_list && $page_navigation->total_page > 1">
+		{@ $prev_page = max($page-1, 1); $next_page = min($page+1, $page_navigation->last_page); }
+		<a cond="$page != $prev_page" href="{getUrl('page', '', 'division', $division ?? '', 'last_division', $last_division ?? '')}" title="{$lang->first_page}">
+			<i class="xi xi-step-backward"></i>
+		</a> 
+		<a cond="$page != $prev_page" href="{getUrl('page', $prev_page != 1 ? $prev_page : '', 'division', $division, 'last_division', $last_division)}" title="{$lang->prev_page}">
+			<i class="xi xi-angle-left"></i>
+		</a>
+		<block loop="$page_no=$page_navigation->getNextPage()">
+			<strong cond="$page==$page_no">{$page_no}</strong> 
+			<a cond="$page!=$page_no" href="{getUrl('page', $page_no, 'division', $division ?? '', 'last_division', $last_division ?? '')}">{$page_no}</a>
+		</block>
+		<a cond="$page != $next_page" href="{getUrl('page', $next_page, 'division', $division ?? '', 'last_division', $last_division ?? '')}" title="{$lang->next_page}">
+			<i class="xi xi-angle-right"></i>
+		</a>
+		<a cond="$page != $next_page" href="{getUrl('page', $page_navigation->last_page, 'division', $division ?? '', 'last_division', $last_division ?? '')}" title="{$lang->last_page}">
+			<i class="xi xi-step-forward"></i>
+		</a>
+	</div>
+	<!-- /PAGINATE -->
+
+	<div class="navi">
+		<div class="navi_fl">
+			<a class="navi_btn" href="{getUrl('', 'mid', $mid, 'category', $category, 'list_style', '')}"><i class="xi xi-calendar-month"></i> {$lang->calendar}</a>
+			<a class="navi_btn btn_search" href="#search"><i class="xi xi-magnifier"></i> {$lang->cmd_search}</a>
+			<a class="navi_btn" href="{getUrl('', 'mid', $mid, 'act','dispScheduleAdminInsertModule', 'list_style', $list_style)}" cond="$grant->manager"><i class="xi xi-cog"></i> {$lang->cmd_setup}</a>
+		</div>
+		<div class="navi_fr" cond="$grant->write">
+			<a class="navi_btn black" href="{getUrl('page', '', 'schedule_srl', '', 'search_target', '', 'search_keyword', '', 'act', 'dispScheduleInsert', 'selected_month', ($selected_month)?:date('Ym'), 'selected_day', (!$month ||$month == date('m'))?date('d'):'01')}"><i class="xi xi-calendar-add"></i> {$lang->cmd_make}</a>
+		</div>
+	</div>
+
+	<include target="list_modal.html" />
+
+</div>
+
+<include target="_footer.html" />

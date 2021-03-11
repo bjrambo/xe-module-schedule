@@ -1,0 +1,75 @@
+<include target="_header.html" />
+
+<div class="navi">
+	<div class="navi_fl">
+		<a class="navi_btn black" href="{getUrl('act', '', 'schedule_srl', '')}" >{(!$list_style || $list_style != 'list') ? '<i class="xi xi-calendar-month"></i> ' . $lang->calendar : '<i class="xi xi-list-ul-square"></i> ' .$lang->cmd_list}</a>
+		<a class="navi_btn btn_search" href="#status" cond="$grant->manager"><i class="xi xi-info-circle"></i> {$lang->status_list[$oSchedule->status]}</a>
+	</div>
+	<div class="navi_fr" cond="$oSchedule->isEditable()">
+		<a class="navi_btn" href="{getUrl('act', 'dispScheduleInsert', 'page', '', 'search_target', '', 'search_keyword', '')}">{$lang->cmd_modify}</a>
+		<a class="navi_btn" href="{getUrl('act', 'dispScheduleDelete', 'page', '', 'search_target', '', 'search_keyword', '')}">{$lang->cmd_delete}</a>
+	</div>
+</div>
+
+<div class="atc has_list">
+	<header class="atc_header">
+		<div class="title_wrap">
+			<h1>
+				<div class="atc_ctg" cond="$is_public">{$oSchedule->getCurrentCategoryHTML()}</div>
+				{$oSchedule->getTitle()}
+			</h1>
+		</div>
+		<div class="atc_info clearfix" cond="$is_public">
+			<ul>
+				<li class="text_en" cond="$oSchedule->get('is_recurrence') == 'Y'">{$oSchedule->getSelectedDate('Y년 n월 j일')}</li>
+				<li class="text_en" cond="$oSchedule->get('is_recurrence') != 'Y'">{$oSchedule->getBasicScheduleInfo('Y년 n월 j일 H시 i분')}</li>
+			</ul>
+		</div>
+	</header>
+	<div class="atc_body">
+		<table class="atc_ex" cellspacing="0" cellpadding="0" cond="$is_public">
+			<tbody>
+				<tr cond="$oSchedule->get('is_recurrence') == 'Y'">
+					<th>{$lang->basic_schedule}</th>
+					<td>{$oSchedule->getBasicScheduleInfo('Y년 n월 j일 H시 i분')}</td>
+				</tr>
+				<tr cond="$oSchedule->get('is_recurrence') == 'Y'">
+					<th>{$lang->recur_option}</th>
+					<td>{$oSchedule->getRecurDescHTML()}</td>
+				</tr>
+				<tr>
+					<th>{$lang->nick_name}</th>
+					<td><img class="atc_prof" src="{$oSchedule->getProfileImage()}" cond="$oSchedule->getProfileImage()" /><a href="#popup_menu_area" class="atc_author member_{$oSchedule->member_srl}" onclick="return false">{$oSchedule->get('nick_name')}</a></td>
+				</tr>
+				<tr cond="$oSchedule->isGranted()">
+					<th>{$lang->status_list['STANDBY']}/{$lang->status_list['PUBLIC']}</th>
+					<td><span>{$lang->status_list[$oSchedule->status]}</span></td>
+				</tr>
+				<tr cond="$oSchedule->get('place')">
+					<th>{$lang->place}</th>
+					<td><span>{$oSchedule->get('place')}</span></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="document_{$oSchedule->schedule_srl}_{$oSchedule->member_srl} xe_content" cond="$oSchedule->getContent()">
+			{$oSchedule->getContent()}
+		</div>
+	</div>
+</div>
+
+<div class="modal_target" id="modal_status" cond="$grant->manager">
+	<div class="modal_target_container">
+		<h3>{$lang->schedule} {$lang->cmd_publish}<i class="xi xi-close"></i></h3>
+		<div class="modal_target_wrapper">
+			<div class="modal_target_selector">
+				<p class="modal_confirm">{sprintf($lang->status_confirm, ($oSchedule->status == 'STANDBY') ? $lang->status_list['PUBLIC'] : $lang->status_list['STANDBY'])}</p>
+			</div>
+			<div class="modal_target_commander">
+				<a href="javascript:void(0);" class="navi_btn btn_submit">{$lang->cmd_modify}</a>
+				<a href="javascript:void(0);" class="navi_btn btn_close">{$lang->cmd_cancel}</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<include target="_footer.html" />
