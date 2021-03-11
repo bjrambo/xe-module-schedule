@@ -1,0 +1,21 @@
+<query id="updateScheduleRecur" action="update">
+    <tables>
+        <table name="schedule_recur" />
+    </tables>
+    <columns>
+		<column name="recur_type" var="recur_type" />
+		<column name="recur_regular" var="recur_regular" />
+		<column name="week_order" var="week_order" />
+		<column name="weekdays" var="weekdays" />
+		<column name="recur_lunar" var="recur_lunar" />
+        <column name="recur_cycle" var="recur_cycle" />
+        <column name="recur_unit" var="recur_unit" />
+        <column name="recur_freq" var="recur_freq" />
+        <column name="stop_date" var="stop_date" />
+        <column name="exception_type" var="exception_type" />
+        <column name="exception_option" var="exception_option" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="schedule_srl" var="schedule_srl" filter="number" notnull="notnull" />
+    </conditions>
+</query>

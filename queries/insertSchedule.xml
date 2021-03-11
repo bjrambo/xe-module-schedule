@@ -1,14 +1,31 @@
 <query id="insertSchedule" action="insert">
 	<tables>
-		<table name="schedule_list" />
+		<table name="schedules" />
 	</tables>
 	<columns>
 		<column name="schedule_srl" var="schedule_srl" notnull="notnull" />
-		<column name="selected_date" var="selected_date" />
-		<column name="schedule_name" var="schedule_name" />
-		<column name="schedule_content" var="schedule_content" />
-		<column name="member_srl" var="member_srl" />
-		<column name="regdate" var="regdate" />
 		<column name="module_srl" var="module_srl" />
+		<column name="category_srl" var="category_srl" />
+
+		<column name="title" var="title" />
+		<column name="title_color" var="title_color" />
+		<column name="content" var="content" />
+		<column name="regdate" var="regdate" />
+		<column name="status" var="status" />
+
+		<column name="start_date" var="start_date" />
+		<column name="start_time" var="start_time" />
+		<column name="end_date" var="end_date" />
+		<column name="end_time" var="end_time" />
+		<column name="is_allday" var="is_allday" />
+		<column name="selected_date" var="selected_date" />
+		<column name="place" var="place" />
+		<column name="is_recurrence" var="is_recurrence" />
+
+		<column name="list_order" var="list_order" />
+		<column name="nick_name" var="nick_name" />
+		<column name="member_srl" var="member_srl" />
+		<column name="email_address" var="email_address" />
+		<column name="password" var="password" />
 	</columns>
 </query>

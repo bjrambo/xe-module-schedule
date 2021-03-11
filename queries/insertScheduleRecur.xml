@@ -1,0 +1,19 @@
+<query id="insertScheduleRecur" action="insert">
+	<tables>
+		<table name="schedule_recur" />
+	</tables>
+	<columns>
+		<column name="schedule_srl" var="schedule_srl" filter="number" notnull="notnull" />
+		<column name="recur_type" var="recur_type" notnull="notnull" />
+		<column name="recur_regular" var="recur_regular" />
+		<column name="week_order" var="week_order" />
+		<column name="weekdays" var="weekdays" />
+		<column name="recur_lunar" var="recur_lunar" />
+		<column name="recur_cycle" var="recur_cycle" filter="number" notnull="notnull" />
+		<column name="recur_unit" var="recur_unit" notnull="notnull" />
+		<column name="recur_freq" var="recur_freq" filter="number" />
+		<column name="stop_date" var="stop_date" />
+        <column name="exception_type" var="exception_type" />
+        <column name="exception_option" var="exception_option" />
+	</columns>
+</query>

@@ -1,11 +1,11 @@
-<query id="getSchedule" action="select">
+<query id="deleteScheduleRecur" action="delete">
 	<tables>
-		<table name="schedules" />
+		<table name="schedule_recur" />
 	</tables>
 	<columns>
-		<column name="*" />
+		<column name="*"/>
 	</columns>
 	<conditions>
 		<condition operation="equal" column="schedule_srl" var="schedule_srl" />
-	</conditions> 
+	</conditions>
 </query>
