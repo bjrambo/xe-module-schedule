@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="0.2">
-	<title xml:lang="ko">XE Schedule</title>
-	<version>1.1</version>
-	<date>2015-04-27</date>
-	<author link="http://www.swhite523.com/">
+	<title xml:lang="ko">스케줄</title>
+	<version>2.3</version>
+	<date>2021-03-03</date>
+	<author link="https://bjrambo.com/">
 		<name xml:lang="ko">BJRambo</name>
+	</author>
+	<author email_address="cydemo@gmail.com" link="https://dev.aporia.blog/">
+		<name xml:lang="ko">윤삼</name>
 	</author>
 </module>
