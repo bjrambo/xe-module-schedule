@@ -1,0 +1,39 @@
+<include target="_header.html" />
+
+<div class="navi">
+	<div class="navi_fl">
+		<a class="navi_btn" href="#" onclick="history.back(); return false;"><i class="xi xi-rollback"></i> {$lang->cmd_back}</a>
+	</div>
+</div>
+
+<div class="atc has_list no_profile">
+	<header class="atc_header">
+		<div class="title_wrap">
+			<h1>
+				<div class="atc_ctg">{$oSchedule->getCurrentCategoryHTML()}</div>
+				<span style="color: {$oSchedule->get('title_color')};"|cond="$oSchedule->get('title_color')">{$oSchedule->getTitle()}</span>
+			</h1>
+		</div>
+		<div class="atc_info clearfix">
+			<ul>
+				<li class="text_en" cond="$oSchedule->get('is_recurrence') == 'Y'">{$oSchedule->getSelectedDate('Y년 n월 j일')}</li>
+				<li class="text_en" cond="$oSchedule->get('is_recurrence') != 'Y'">{$oSchedule->getBasicScheduleInfo('Y년 n월 j일 H시 i분')}</li>
+			</ul>
+		</div>
+	</header>
+	<div class="atc_body">
+		<form action="{Context::getRequestUri()}" method="post" class="atc_delete">
+			<input type="hidden" name="mid" value="{$mid}"/>
+			<input type="hidden" name="category_srl" value="{$category_srl}" cond="$category_srl" />
+			<input type="hidden" name="schedule_srl" value="{$schedule_srl}" />
+			<input type="hidden" name="selected_month" value="{$selected_month}" cond="$selected_month" />
+			<input type="hidden" name="list_style" value="{$list_style}" cond="$list_style" />
+			<input type="hidden" name="act" value="procScheduleDeleteSchedule" />
+			<p class="atc_confirm">{$lang->delete_confirm}</p>
+			<div class="atc_command">
+				<a class="navi_btn" href="#" onclick="history.back(); return false;">{$lang->cmd_cancel}</a>
+				<button class="navi_btn black" type="submit">{$lang->cmd_delete}</a>
+			</div>
+		</form>
+	</div>
+</div>

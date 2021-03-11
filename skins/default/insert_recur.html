@@ -1,0 +1,125 @@
+<div class="modal_target" id="modal_recur">
+	<div class="modal_target_container">
+		<h3>{$lang->recur} {$lang->cmd_setup}<i class="xi xi-close"></i></h3>
+
+		<ul class="modal_target_tabs">
+			<li loop="$recur_type => $key, $type" class="modal_target_tab<!--@if($key == $recur_info->recur_type || (!$recur_info->recur_type && $key == 'regular'))--> on<!--@end-->"><a href="#recur_{$key}">{$type}</a></li>
+		</ul>
+
+		<div class="modal_target_wrapper">
+
+			<div loop="$recur_type => $key, $type" class="modal_target_selector" id="recur_{$key}" style="display: none"|cond="$key != $recur_info->recur_type && ($recur_info->recur_type || $key != 'regular')">
+			<!--// 반복 옵션 : 정기 일정 -->
+			<!--@if($key == 'regular')-->
+				<label loop="$regular_type => $k, $_type" for="recur_regular_{$k}">
+					<input type="radio" name="recur_regular" value="{$k}" id="recur_regular_{$k}" checked|cond="$k == $recur_info->recur_regular" />
+					<span>{$_type}</span>
+				</label>
+			<!--// 반복 옵션 : 요일 설정 -->
+			<!--@elseif($key == 'weekday')-->
+				<div>
+					<label loop="$week_order => $k, $order" for="order_{$k}">
+						<input type="checkbox" name="week_order[]" value="{$k}" id="order_{$k}"<!--@if(in_array($k, explode('|@|', $recur_info->week_order)))--> checked<!--@end--> />
+						<span>{$order}</span>
+					</label>
+				</div>
+				<div>
+					<label loop="$weekdays => $k, $weekday" for="weekday_{$k}">
+						<input type="checkbox" name="weekdays[]" value="{$k}" id="weekday_{$k}"<!--@if(in_array($k, explode('|@|', $recur_info->weekdays)))--> checked<!--@end--> />
+						<span>{$weekday}</span>
+					</label>
+				</div>
+			<!--// 반복 옵션 : 음력 설정 -->
+			<!--@elseif($key == 'lunar')-->
+				<div>
+					<span>{$lang->regular_type['yearly']} {$lang->recur_type['lunar']} </span>
+					<div class="recur_lunar_start">
+						<span class="lunar_year" style="display:none;"></span>
+						<span class="lunar_leap"></span><span class="lunar_month"></span><span class="lunar_day"></span>
+					</div>
+					<div class="recur_lunar_end">
+						<span class="lunar_year" style="display:none;"></span>
+						<span class="lunar_leap"></span><span class="lunar_month"></span><span class="lunar_day"></span>
+					</div>
+				</div>
+			<!--// 반복 옵션 : 직접 설정 -->
+			<!--@elseif($key == 'manual')-->
+				<select loop="$recur_unit => $k, $val" class="setup_cycle_{$k}<!--@if(($recur_info->recur_unit && $recur_info->recur_unit != $k) || (!$recur_info->recur_unit && $k != 'day'))--> hidden<!--@end-->">
+					<option loop="$i = 1; $i <= $val['max_length']; $i++" value="{$i}" selected|cond="$i == $recur_info->recur_cycle && $recur_info->recur_unit == $k">{$i}</option>
+				</select>
+				<select name="recur_unit" class="setup_unit">
+					<option loop="$recur_unit => $k, $val" value="{$k}" selected|cond="$recur_info->recur_unit == $k">{$val['unit_name']}</option>
+				</select>
+				{$lang->per}
+			<!--@end-->
+			</div>
+
+			<!--// 반복 옵션 : 세부 옵션 -->
+			<div class="modal_target_options">
+				<!--// 반복 옵션 : 반복 횟수 -->
+				<div class="modal_target_option_tr" id="setup_freq">
+					<div class="modal_target_option_td">
+						<input class="setup_freq" type="number" name="recur_freq" id="recur_freq" value="{$recur_info->recur_freq}" placeholder="0" />
+					</div>
+					<div class="modal_target_option_th">
+						<span>{$lang->unit_count} {$lang->recur}</span>
+					</div>
+				</div>
+				<!--// 반복 옵션 : 반복 종료일 -->
+				<div class="modal_target_option_tr" id="setup_stop">
+					<datetime
+						class="theme-gray modal_target_option_td"
+						type="date"
+						title="{$lang->stop}"
+						placeholder="YYYY-MM-DD"
+						zone="Asia/Seoul"
+						value-zone="Asia/Seoul"
+						format="yyyy-MM-dd"
+						:phrases="{ok: '{$lang->cmd_select}', cancel: '{$lang->cmd_cancel}'}"
+						v-model="defaultDateTime"
+						:week-start="7"
+						:min-datetime="minDatetime"
+					>
+					</datetime>
+					<i v-if="defaultDateTime" class="xi xi-close reset_stop_date" @click="resetDate"></i>
+					<input class="setup_stop_date" type="hidden" name="stop_date" id="stop_date" value="{zdate($recur_info->stop_date, 'Y-m-d')}" />
+					<div class="modal_target_option_th">
+						<span>{sprintf($lang->stopped_on, '')}</span>
+					</div>
+				</div>
+				<!--// 반복 옵션 : 횟수/종료 관련 설명 -->
+				<div class="modal_target_option_cap<!--@if(!$recur_info->recur_freq && !$recur_info->stop_date)--> shown<!--@end-->">
+					<p>{$lang->msg_option_desc}</p>
+				</div>
+				<!--// 반복 옵션 : 예외 설정 -->
+				<div class="modal_target_option_tr" id="setup_exception">
+					<div class="modal_target_option_th">
+						<span>{$lang->exception_setting}</span>
+					</div>
+					<div class="modal_target_option_td">
+						<!--// 반복 옵션 : 예외 유형 -->
+						<div>
+							<label loop="$exception_type => $key, $type" for="exception_{$key}">
+								<input type="checkbox" name="exception_type[]" value="{$key}" checked|cond="in_array($key, explode('|@|', $recur_info->exception_type))" id="exception_{$key}" disabled|cond="$key != 'holiday' && $recur_info->recur_type == 'weekday'" />
+								<span>{$type}</span>
+							</label>
+						</div>
+						<!--// 반복 옵션 : 예외 옵션 -->
+						<div class="modal_additive_option" style="display: none"|cond="!$recur_info->exception_type">
+							<label loop="$exception_option => $key, $opt" class="hidden"|cond="($recur_info->recur_type != 'weekday' && in_array($key, array('prev_week', 'next_week'))) || ($recur_info->recur_type == 'weekday' && in_array($key, array('prev_day', 'next_day')))" for="opt_{$key}">
+								<input type="radio" name="exception_option" value="{$key}" id="opt_{$key}" checked|cond="$recur_info->exception_option == $key" />
+								<span>{$opt}</span>
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--// 반복 옵션 : 설정 및 취소 버튼 -->
+			<div class="modal_target_commander">
+				<a href="javascript:void(0);" class="navi_btn btn_close">{$lang->cmd_cancel}</a>
+				<a href="javascript:void(0);" class="navi_btn btn_submit">{$lang->cmd_setup}</a>
+			</div>
+		</div>
+	</div>
+</div>

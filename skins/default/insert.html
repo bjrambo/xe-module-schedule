@@ -1,0 +1,166 @@
+<include target="_header.html" />
+
+<div class="navi">
+	<div class="navi_fl">
+		<a class="navi_btn" href="#" onclick="history.back(); return false;"><i class="xi xi-rollback"></i> {$lang->cmd_back}</a>
+	</div>
+</div>
+
+<form action="./" method="post" action="{Context::getRequestUri()}" onsubmit="return procFilter(this, window.insert)">
+
+	<div class="atc_insert">
+		<input type="hidden" name="schedule_srl" value="{$oSchedule->schedule_srl}" />
+		<input type="hidden" name="module_srl" value="{$module_info->module_srl} "/>
+		<input type="hidden" name="mid" value="{$mid}" />
+		<input type="hidden" name="list_style" value="{$list_style}" cond="$list_style" />
+		<input type="hidden" name="act" value="procScheduleInsertSchedule" />
+		<input type="hidden" name="xe_validator_id" value="modules/schedule/skins/default/1" />
+		<input type="hidden" name="content" value="{htmlspecialchars($oSchedule->get('content'))}" />
+		<input type="hidden" name="start_date" id="start_date" value="{$start_date}" />
+		<input type="hidden" name="start_time" id="start_time" value="{$start_time}" />
+		<input type="hidden" name="end_date" id="end_date" value="{$end_date}" />
+		<input type="hidden" name="end_time" id="end_time" value="{$end_time}" />
+		<input type="hidden" name="selected_date" id="selected_date" value="{$oSchedule->get('selected_date')}" />
+		<input type="hidden" name="recur_type" id="recur_type" value="{$recur_info->recur_type}" />
+		<input type="hidden" name="recur_cycle" id="recur_cycle" value="{$recur_info->recur_cycle}" />
+
+		<div class="atc is_insert">
+			<header class="atc_header">
+				<div class="title_wrap">
+					<h1>
+						<select name="category_srl" class="atc_ctg" cond="$module_info->hide_category != 'Y' && $category_list">
+							<option value="">{$lang->category} {$lang->cmd_select}</option>
+							<option loop="$category_list => $srl, $val" disabled="disabled"|cond="!$val->grant" value="{$srl}" selected="selected"|cond="$val->grant && $val->selected || $oSchedule->category_srl == $srl">{$val->depth ? $category_list[$category_list[$srl]->parent_srl]->title . ' &gt; ' . $val->title : $val->title}</option>
+						</select>
+						<input type="text" name="title" value="{$oSchedule->getTitleText()}" class="insert_title" placeholder="{$lang->msg_input_title}" style="color: {$oSchedule->get('title_color')};"|cond="$oSchedule->get('title_color')" />
+					</h1>
+				</div>
+				<div class="atc_info clearfix">
+					<ul>
+						<li class="text_en">
+							<label for="is_allday">
+								<input type="checkbox" name="is_allday" value="Y" checked="checked"|cond="$oSchedule->get('is_allday') == 'Y'" id="is_allday" />
+								<span>{$lang->allday}</span>
+							</label>
+							<input type="text" class="date_for_allday<!--@if($oSchedule->get('is_allday') != 'Y')--> hidden<!--@end-->" value="{zdate($start_date, 'Y-m-d')}" readonly />
+							<div id="insert_start">
+								<datetime
+									class="theme-gray"
+									type="datetime"
+									disabled|cond="$oSchedule->get('is_allday') == 'Y'"
+									title="{$lang->start}"
+									zone="Asia/Seoul"
+									value-zone="Asia/Seoul"
+									format="yyyy-MM-dd HH:mm"
+									:phrases="{ok: '{$lang->cmd_select}', cancel: '{$lang->cmd_cancel}'}"
+									input-class="insert_start"
+									v-model="defaultDateTime"
+									:week-start="7"
+									@change="setDateTime"
+								></datetime>
+							</div>
+							<span>&nbsp;~&nbsp;</span>
+							<div id="insert_end">
+								<datetime
+									class="theme-gray"
+									type="datetime"
+									disabled|cond="$oSchedule->get('is_allday') == 'Y'"
+									title="{$lang->end}"
+									zone="Asia/Seoul"
+									value-zone="Asia/Seoul"
+									format="yyyy-MM-dd HH:mm"
+									:phrases="{ok: '{$lang->cmd_select}', cancel: '{$lang->cmd_cancel}'}"
+									input-class="insert_end"
+									v-model="defaultDateTime"
+									:week-start="7"
+									:min-datetime="minDatetime"
+								></datetime>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</header>
+
+			<div class="atc_body">
+				<table class="atc_ex" cellspacing="0" cellpadding="0">
+					<tbody>
+						<tr cond="!$is_logged">
+							<th>{$lang->nick_name}</th>
+							<td>
+								<input type="text" name="nick_name" id="nick_name" value="{$oSchedule->get('nick_name')}" />
+							</td>
+						</tr>
+						<tr cond="!$is_logged">
+							<th>{$lang->email_address}</th>
+							<td>
+								<input type="email" name="email_address" id="email_address" value="{$oSchedule->get('email_address')}" />
+							</td>
+						</tr>
+						<tr cond="!$is_logged">
+							<th>{$lang->password}</th>
+							<td>
+								<input type="password" name="password" id="password" value="" />
+							</td>
+						</tr>
+						<tr>
+							<th>{$lang->recur}</th>
+							<td>
+								<div class="insert_recur toggle_btn" id="is_recurrence">
+									<input type="checkbox" name="is_recurrence" value="Y" checked="checked"|cond="$oSchedule->get('is_recurrence') == 'Y'" />
+									<strong></strong>
+								</div>
+								<span class="toggle_desc not_set<!--@if($oSchedule->get('is_recurrence') != 'Y')--> shown<!--@end-->">{$lang->no_recur}</span>
+								<span class="toggle_desc is_set<!--@if($oSchedule->get('is_recurrence') == 'Y')--> shown<!--@end-->">
+									<div class="toggle_desc_content">{$oSchedule->getRecurDescHTML()}</div>
+								</span>
+							</td>
+						</tr>
+						<tr style="display: none;" cond="$grant->manager">
+							<th>{$lang->exception} 복원</th>
+							<td>
+								<div class="insert_exception toggle_btn" id="exception">
+									<input type="checkbox" name="exception" value="Y" checked="checked"|cond="$oSchedule->get('exception') == 'Y'" />
+									<strong></strong>
+								</div>
+								<span>예외일이 있을 경우 불러와서 루프 돌린 후 체크해서 복원가능하도록 함</span>
+							</td>
+						</tr>
+						<tr>
+							<th>{$lang->place}</th>
+							<td>
+								<input class="insert_place" type="text" name="place" id="place" value="{$oSchedule->get('place')}" placeholder="{$lang->msg_input_place}" />
+							</td>
+						</tr>
+						<tr>
+							<th>{$lang->schedule} {$lang->color}</th>
+							<td>
+								<!--%load_js_plugin("ui.colorpicker")-->
+								<input class="insert_title_color color-indicator" type="text" name="title_color" id="title_color" value="{$oSchedule->get('title_color')}" placeholder="{$lang->color} {$lang->cmd_select}" />
+							</td>
+						</tr>
+						<tr>
+							<th>{$lang->cmd_publish} {$lang->status}</th>
+							<td>
+								<label loop="$status_list => $key, $val" for="{$key}">
+									<input type="radio" name="status" value="{$key}" id="{$key}" checked|cond="$oSchedule->status == $key || (!$schedule_srl && $module_info->set_status == $key)" />
+									<span>{$val}</span>
+								</label>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="atc_editor">{$oSchedule->getEditor()}</div>
+			</div>
+		</div>
+
+		<div class="atc_command">
+			{$captcha}
+			<button class="navi_btn black" type="submit"><i class="xi xi-upload-square"></i> {$lang->cmd_registration}</a>
+		</div>
+	</div>
+
+	<!--// 반복 옵션 : 시작 -->
+	<include target="insert_recur.html" />
+	<!--// 반복 옵션 : 끝 -->
+
+</form>

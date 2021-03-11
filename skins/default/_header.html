@@ -1,0 +1,46 @@
+<load target="./css/default.css" />
+<load target="../../../../common/xeicon/xeicon.min.css" />
+
+<!--@if(!$act || $act == 'dispScheduleContent')-->
+
+	<!--@if(!$schedule_srl)-->
+
+		<load target="./js/index.js" type="body" />
+		<load target="./js/index_m.js" type="body" cond="$is_mobile" />
+
+		<!--@if($list_style != 'list')-->
+			<load target="./css/index.css" />
+			<load target="./js/hammer.min.js" cond="$is_mobile" />
+			<load target="./js/index_calendar_m.js" type="body" cond="$is_mobile" />
+			<div class="navi_loading hidden" cond="$is_mobile">
+				<i class="navi_loader xi-spinner-4 xi-spin"></i>
+			</div>
+		<!--@elseif($list_style == 'list')-->
+			{@ $order_type = isset($order_type) && $order_type == 'desc' ? 'asc' : 'desc'; }
+			<load target="./css/list.css" />
+		<!--@end-->
+
+	<!--@elseif($schedule_srl)-->
+
+		<load target="./css/extra.css" />
+		<load target="./js/schedule.js" type="body" cond="$grant->manager" />
+
+	<!--@end-->
+
+	{(!$is_mobile || !$is_mobile_enabled) ? $module_info->header_text : $module_info->mobile_header_text}
+
+<!--@else-->
+
+	<load target="./css/extra.css" />
+
+	<!--@if($act == 'dispScheduleInsert')-->
+		<load target="./vue/vue.js" />
+		<load target="./vue/luxon.min.js" />
+		<load target="./vue/weekstart.js" />
+		<load target="./vue/vue-datetime.min.js" />
+		<load target="./vue/vue-datetime.min.css" />
+		<load target="./js/insert_func.js" />
+		<load target="./js/insert.js" type="body" />
+	<!--@end-->
+
+<!--@end-->
