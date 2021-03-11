@@ -2,8 +2,8 @@
 <skin version="0.2">
 	<title xml:lang="ko">기본 스케줄러</title>
 	<description xml:lang="ko">기본 스케줄러입니다.</description>
-	<version>0.3</version>
-	<date>2021-03-03</date>
+	<version>0.4</version>
+	<date>2021-03-12</date>
 	<author email_address="cydemo@gmail.com" link="https://dev.aporia.blog/">
 		<name xml:lang="ko">아포리아</name>
 	</author>

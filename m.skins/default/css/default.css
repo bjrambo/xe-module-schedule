@@ -265,10 +265,11 @@
 }
 .modal_target_container .modal_target_selector#recur_weekday {
 	text-align: left;
-	font-size: 12px;
+	font-size: 14px;
 }
 .modal_target_container .modal_target_selector#recur_weekday div {
 	display: table-cell;
+	width: 50%;
 }
 .modal_target_container .modal_target_selector#recur_lunar > div {
 	font-size: 0;
@@ -399,6 +400,13 @@
 {
 	color: #888;
 	font-size: 20px;
+}
+#modal_category .modal_target_container .modal_target_selector {
+	display: flex;
+}
+#modal_category .modal_item_picker {
+	flex: 1;
+	width: auto;
 }
 
 

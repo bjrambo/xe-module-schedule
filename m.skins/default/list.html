@@ -36,7 +36,7 @@
 					<th loop="$list_config => $key, $val" scope="col">
 					<!--@if(in_array($key, $order_target) || $key == 'no')-->
 						<a href="{getUrl('sort_index', $key, 'order_type', $order_type)}">
-							{$val}<span cond="$sort_index == $key && $order_type">{$order_type == 'desc' ? '<i class="xi xi-caret-up"></i>' : '<i class="xi xi-caret-down"></i>'}</span>
+							{$val}<span cond="$order_type && ($sort_index == $key || ($sort_index == 'schedule_srl' && $key == 'no'))">{$order_type == 'desc' ? '<i class="xi xi-caret-up"></i>' : '<i class="xi xi-caret-down"></i>'}</span>
 						</a>
 					<!--@else-->
 						<span>{$val}</span>
