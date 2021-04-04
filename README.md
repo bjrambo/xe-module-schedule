@@ -1,6 +1,6 @@
-## xe-module-Schedule
+## rx-module-Schedule
 
-XE Schedule
+RX Schedule
 
 
 ## 개요
