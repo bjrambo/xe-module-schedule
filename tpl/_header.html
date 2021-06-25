@@ -1,23 +1,50 @@
-<ul class="x_nav x_nav-tabs">
-	
-	<li class="x_active"|cond="$act == 'dispScheduleAdminDashboard'">
-		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDashboard')}">대쉬보드</a>
-	</li>
-	<li class="x_active"|cond="$act == 'dispScheduleAdminInsertModule'">
-		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminInsertModule')}">시작</a>
-	</li>
-	<li class="x_active"|cond="$act == 'dispScheduleAdminConfig'">
-		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminConfig')}">설정</a>
-	</li>
-	<li class="x_active" cond="$act == 'dispScheduleAdminDeleteMid'">
-		<a href="{getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDeleteMid')}">모듈 삭제</a>
-	</li>
-</ul>
 <div class="x_page-header">
 	<h1>
-		유저 스케줄 모듈
+		{$lang->schedule_admin}
+		<span class="path" cond="$module_info->mid">
+			&gt; <a href="{getUrl('', 'mid', $module_info->mid, 'list_style', $list_style)}" target="_blank"|cond="$module=='admin'">{$module_info->mid}<block cond="$module_info->is_default=='Y'">({$lang->is_default})</block></a>
+		</span>
+		<a href="#aboutModule" data-toggle class="x_icon-question-sign">{$lang->help}</a>
 	</h1>
+	<p class="x_alert x_alert-info" id="aboutModule" hidden>{$lang->about_module}</p>
 </div>
 
-<p id="descModule" class="x_alert x_alert-info" hidden="hidden">유저 스케줄 모듈입니다.</p>
-
+{@
+	if ( $module == 'admin' ) :
+		$_module = $module;
+		$_mid = '';
+	else :
+		$_module = '';
+		$_mid = $mid;
+	endif;
+}
+<ul class="x_nav x_nav-tabs" cond="$act != 'dispScheduleAdminDeleteMid'">
+	<!--@if($module == 'admin')-->
+	<li class="x_active"|cond="$act == 'dispScheduleAdminDashboard'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', '', 'act', 'dispScheduleAdminDashboard', 'list_style', $list_style)}">{$lang->dashboard}</a>
+	</li>
+	<li class="x_active"|cond="$act == 'dispScheduleAdminScheduleList'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', $module_srl, 'act', 'dispScheduleAdminScheduleList', 'list_style', $list_style)}">{$lang->schedule_list}</a>
+	</li>
+	<!--@end-->
+	<li class="x_active"|cond="$act == 'dispScheduleAdminInsertModule'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', $module_srl, 'act', 'dispScheduleAdminInsertModule', 'list_style', $list_style)}">{$module_srl ? $lang->module_info : '모듈 추가'}</a>
+	</li>
+	<!--@if($module_srl)-->
+	<li class="x_active"|cond="$act == 'dispScheduleAdminCategoryInfo'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', $module_srl, 'act', 'dispScheduleAdminCategoryInfo', 'list_style', $list_style)}">{$lang->cmd_manage_category}</a>
+	</li>
+	<li class="x_active"|cond="$act == 'dispScheduleAdminGrantInfo'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', $module_srl, 'act', 'dispScheduleAdminGrantInfo', 'list_style', $list_style)}">{$lang->cmd_manage_grant}</a>
+	</li>
+	<li class="x_active"|cond="$act == 'dispScheduleAdminAdditionSetup'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', $module_srl, 'act', 'dispScheduleAdminAdditionSetup', 'list_style', $list_style)}">{$lang->cmd_addition_setup}</a>
+	</li>
+	<li class="x_active"|cond="$act=='dispScheduleAdminSkinInfo'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', $module_srl, 'act','dispScheduleAdminSkinInfo', 'list_style', $list_style)}">{$lang->cmd_manage_skin_config}</a>
+	</li>
+	<li cond="Mobile::isMobileEnabled()" class="x_active"|cond="$act=='dispScheduleAdminMobileSkinInfo'">
+		<a href="{getUrl('', 'module', $_module, 'mid', $_mid, 'module_srl', $module_srl, 'act','dispScheduleAdminMobileSkinInfo', 'list_style', $list_style)}">{$lang->cmd_manage_mobile_skin_config}</a>
+	</li>
+	<!--@end-->
+</ul>

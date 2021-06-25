@@ -1,0 +1,87 @@
+@charset "utf-8";
+
+.schedule, .schedule label, .schedule table, .schedule input, .schedule button, .schedule textarea, .schedule select {
+    font-size: 12px;
+}
+.schedule a {
+	color: #666;
+	text-decoration: none;
+}
+
+/* List */
+
+.schedule_list {
+    position: relative;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+.tbl_scdl_list {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-bottom: 1px solid #e5e5e5;
+	border-top: 1px solid #e5e5e5;
+    min-width: max-content;
+}
+.tbl_scdl_list thead th {
+    padding: 12px 4px;
+    color: #666;
+    background-color: #f3f3f3;
+}
+.tbl_scdl_list tbody tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+.tbl_scdl_list tbody tr:hover {
+	background-color: #f6f6f6;
+}
+.tbl_scdl_list tbody tr[onclick] {
+	cursor: pointer;
+}
+.tbl_scdl_list tbody td {
+    padding: 12px 4px;
+    border-top: 1px solid #e5e5e5;
+    color: #666;
+    text-align: center;
+	word-break: keep-all;
+}
+.tbl_scdl_list tbody td a {
+	pointer-events: none;
+}
+.tbl_scdl_list tbody tr:first-child td {
+    border-color: #e5e5e5;
+}
+.tbl_scdl_list tbody td.ta_bold {
+    font-weight: bold;
+}
+.tbl_scdl_list tbody td.ta_bold a {
+    color: #333;
+}
+.tbl_scdl_list tbody td.ta_max {
+	max-width: 160px;
+}
+.tbl_scdl_list tbody td .bd_no_img {
+	color: #ccc;
+}
+
+
+/* PAGINATE */
+
+.scdl_paginate {
+    position: relative;
+    margin-top: 16px;
+    text-align: center;
+}
+.scdl_paginate > a, .scdl_paginate > strong, .scdl_paginate .more_page > a {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    color: #333333;
+    text-align: center;
+}
+.scdl_paginate > strong, .scdl_paginate > a:hover, .scdl_paginate .more_page > a:hover {
+    background-color: #f7f7f7;
+    border-color: #dddddd;
+    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.2s ease-in-out;
+}

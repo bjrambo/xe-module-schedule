@@ -1,6 +1,6 @@
 <query id="getSchedule" action="select">
 	<tables>
-		<table name="schedule_list" />
+		<table name="schedules" />
 	</tables>
 	<columns>
 		<column name="*" />

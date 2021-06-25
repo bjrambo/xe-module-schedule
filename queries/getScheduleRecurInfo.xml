@@ -1,0 +1,11 @@
+<query id="getScheduleRecurInfo" action="select">
+    <tables>
+        <table name="schedule_recur" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="schedule_srl" var="schedule_srl" />
+    </conditions> 
+</query>

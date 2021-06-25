@@ -1,30 +1,46 @@
-<load target="./css/sch.css" />
-<load target="./xeicon/xeicon.min.css" />
-{@$year=substr($selected_date,0,4)}
-{@$month=substr($selected_date,4,2)}
-{@$day=substr($selected_date,6,2)}
+<include target="_header.html" />
 
-<div>
-	{$module_info->header_text_m}
-</div>
-
-<div class="navi" style="margin-left:10px;">
-	<a class="att-btn att-btn-primary" href="#"><i class="fa fa-calendar"></i> {$year}년 {$month}월</a>
-	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'liststyle', 'calendar')}" cond="$liststyle == 'list'">달력형</a>
-	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'liststyle', 'list')}" cond="$liststyle == 'calendar'">리스트형</a>
-	<div style="float:right; margin-right:10px; font-weight:none;">
-		<a class="att-btn att-btn-primary" href="{getUrl('document_srl','','selected_date',zDate(date('YmdHis',mktime(0,0,0,$month-1, $day, $year)),'Ymd'))}">
-			이전달
-		</a>
-		<a class="att-btn att-btn-primary" href="{getUrl('document_srl','','selected_date',zDate(date('YmdHis'),'Ymd'))}">이번달</a>
-		<a class="att-btn att-btn-primary" href="{getUrl('document_srl','','selected_date',zDate(date('YmdHis',mktime(0,0,0,$month+1, $day, $year)),'Ymd'))}">
-			다음달
-		</a>
+<div class="navi">
+	<div class="navi_fl" cond="$is_mobile && $module_info->hide_category != 'Y' && $category_list">
+		<a class="navi_btn btn_search" href="#category"><i class="xi xi-align-justify"></i> {$index->getCurrentCategoryText()}</a>
 	</div>
-	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'act','dispScheduleAdminEditorSetting')}" cond="$grant->manager">에디터 설정</a>
-	<a class="att-btn att-btn-primary" href="{getUrl('', 'mid', $module_info->mid, 'act','dispScheduleAdminGrantInfo')}" cond="$grant->manager">권한 설정</a>
+	<a class="navi_btn to_prev" href="{getUrl('schedule_srl', '', 'selected_month', $index->getPrevMonth($year.$month))}"><i class="xi xi-angle-left"></i></a>
+	<a class="navi_btn btn_search" href="#search">{$year}<br><span>{$month/1}</span></a>
+	<a class="navi_btn to_next" href="{getUrl('schedule_srl', '', 'selected_month', $index->getNextMonth($year.$month))}"><i class="xi xi-angle-right"></i></a>
+	<div class="navi_fr" cond="date('Ym') != $year.$month">
+		<a class="navi_btn" href="{getUrl('act', '', 'schedule_srl', '', 'selected_month', '')}"><i class="xi xi-rotate-left"></i> {$lang->this_month}</a>
+	</div>
+
+	<div class="ctg_list" cond="!$is_mobile && $module_info->hide_category != 'Y' && $category_list">
+		<ul>
+			<li class="active"|cond="!$category">
+				<a href="{getUrl('', 'mid', $mid, 'selected_month', $selected_month)}"><span class="ctg_check" cond="!$category"><i class="xi xi-check"></i></span> {$lang->total}</a>
+			</li>
+			<li loop="$category_list => $srl, $val" class="active"|cond="$category == $srl" cond="!$val->depth">
+				<a href="{getUrl('', 'mid', $mid, 'category', $srl, 'selected_month', $selected_month)}" style="color:{$val->color}"|cond="$val->color && $val->color != 'transparent'"><span class="ctg_check" cond="$category == $srl || $val->expand"><i class="xi xi-check"></i></span> {$val->title} <span class="ctg_drop" cond="$val->child_count"><i class="xi xi-angle-down"></i></span></a>
+				<ul cond="$val->child_count">
+					<li loop="$val->childs => $v" class="active"|cond="$category == $v">
+						{@ $item = $category_list[$v]; }
+						<a href="{getUrl('', 'mid', $mid, 'category', $v, 'selected_month', $selected_month)}" style="color:{$item->color}"|cond="$item->color && $item->color != 'transparent'"><span class="ctg_check" cond="$category == $v"><i class="xi xi-check"></i></span> {$item->title}</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
 </div>
 
-<include target="calendar.html" />
+<include target="index_modal.html" />
 
-{$module_info->footer_text_m}
+<include target="index_calendar.html" />
+
+<div class="navi">
+	<div class="navi_fl">
+		<a class="navi_btn" href="{getUrl('', 'mid', $mid, 'category', $category, 'list_style', 'list')}" cond="$module_info->use_list == 'Y'"><i class="xi xi-list-ul-square"></i> {$lang->cmd_list}</a>
+		<a class="navi_btn" href="{getUrl('', 'mid', $mid, 'act', 'dispScheduleAdminInsertModule', 'list_style', $list_style)}" cond="$grant->manager"><i class="xi xi-cog"></i> {$lang->cmd_setup}</a>
+	</div>
+	<div class="navi_fr" cond="$grant->write">
+		<a class="navi_btn black" href="{getUrl('act', 'dispScheduleInsert', 'selected_month', $year.$month, 'selected_day', ($month == date('m'))? date('d'): '01')}"><i class="xi xi-calendar-add"></i> {$lang->cmd_make}</a>
+	</div>
+</div>
+
+<include target="_footer.html" />

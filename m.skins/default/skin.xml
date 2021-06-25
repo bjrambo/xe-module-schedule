@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <skin version="0.2">
-	<title xml:lang="ko">스케줄 일정</title>
-	<description xml:lang="ko">일정관리 기본 스킨입니다.</description>
-	<version>0.1</version>
-	<date>2015.04</date>
-	<author email_address="qw5414@naver.com" link="http://www.swhite523.com/">
-		<name xml:lang="ko">BJ람보</name>
+	<title xml:lang="ko">기본 스케줄러</title>
+	<description xml:lang="ko">기본 스케줄러입니다.</description>
+	<version>0.4</version>
+	<date>2021-03-12</date>
+	<author email_address="cydemo@gmail.com" link="https://dev.aporia.blog/">
+		<name xml:lang="ko">아포리아</name>
 	</author>
 	<extra_vars>
 	</extra_vars>

@@ -7,20 +7,20 @@ class scheduleAdminController extends schedule
 
 	function procScheduleAdminInsertMid()
 	{
-		$oModuleModel = getModel('module');
+		$args = Context::getRequestVars();
+		$module_info = ModuleModel::getModuleInfoByModuleSrl($args->module_srl);
 		$oModuleController = getController('module');
 
-		$args = Context::getRequestVars();
-		$args->module = 'schedule';
-		if($args->module_srl)
-		{
-			$module_info = $oModuleModel->getModuleInfoByModuleSrl($args->module_srl);
-			if($module_info->module_srl != $args->module_srl)
-			{
-				unset($args->module_srl);
-			}
-		}
-		if($args->module_srl)
+		$args->order_target = $module_info->order_target ? : 'list_order';
+		$args->order_type = $module_info->order_type ? : 'asc';
+		$args->list_count = $module_info->list_count ? : 20;
+		$args->search_list_count = $module_info->search_list_count ? : 20;
+		$args->page_count = $module_info->page_count ? : 10;
+		$args->mobile_list_count = $module_info->mobile_list_count ? : 10;
+		$args->mobile_search_list_count = $module_info->mobile_search_list_count ? : 10;
+		$args->mobile_page_count = $module_info->mobile_page_count ? : 5;
+
+		if ( $args->module_srl )
 		{
 			$output = $oModuleController->updateModule($args);
 			$msg_code = 'success_updated';
@@ -31,44 +31,95 @@ class scheduleAdminController extends schedule
 			$msg_code = 'success_registed';
 		}
 
-		if(!$output->toBool())
+		if ( !$output->toBool() )
 		{
 			return $output;
 		}
 
 		$this->setMessage($msg_code);
-
-		if(!in_array(Context::getRequestMethod(), array('XMLRPC', 'JSON')))
+		if ( $args->is_admin_module )
 		{
-			$redirectUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminInsertModule', 'module_srl', $module_srl);
-			$this->setRedirectUrl($redirectUrl);
+			$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminInsertModule', 'module_srl', $output->get('module_srl')));
+		}
+		else
+		{
+			$this->setRedirectUrl(getNotEncodedUrl('', 'mid', Context::get('mid'), 'act', 'dispScheduleAdminInsertModule'));
 		}
 	}
 
 	function procScheduleAdminInsertConfig()
 	{
+		$schedule_config->api = Context::get('api');
+
 		$oModuleController = getController('module');
-		$config->viewconfig = Context::get('viewconfig');
+		$oModuleController->updateModuleConfig('schedule', $schedule_config);
 
 		$this->setMessage('success_updated');
-
-		$oModuleController->updateModuleConfig('schedule', $config);
-
 		if(!in_array(Context::getRequestMethod(),array('XMLRPC','JSON')))
 		{
-			$returnUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminConfig');
+			$returnUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDashboard');
 			header('location: ' . $returnUrl);
 			return;
+		}
+	}
+
+	/**
+	 * @brief set schedule list configuration
+	 **/
+	function procScheduleAdminSetList($args = null)
+	{
+		// setup the schedule module infortmation
+		$args = Context::getRequestVars();
+		$module_info = ModuleModel::getModuleInfoByModuleSrl($args->module_srl);
+		$oModuleController = getController('module');
+
+		$module_info->order_target = $args->order_target;
+		$module_info->order_type = $args->order_type;
+		if ( !in_array($module_info->order_target, $this->order_target) )
+		{
+			$module_info->order_target = 'list_order';
+		}
+		if ( !in_array($module_info->order_type, array('asc', 'desc')) )
+		{
+			$module_info->order_type = 'asc';
+		}
+		$module_info->list_count = $args->list_count ? : 20;
+		$module_info->search_list_count = $args->search_list_count ? : 20;
+		$module_info->page_count = $args->page_count ? : 10;
+		$module_info->mobile_list_count = $args->mobile_list_count ? : 10;
+		$module_info->mobile_search_list_count = $args->mobile_search_list_count ? : 10;
+		$module_info->mobile_page_count = $args->mobile_page_count ? : 5;
+
+		// update the schedule module based on module_srl
+		$output = $oModuleController->updateModule($module_info);
+		$msg_code = 'success_updated';
+
+		if ( !$output->toBool() )
+		{
+			return $output;
+		}
+
+		// setup list config
+		$list = explode(',', $args->list);
+		if ( count($list) )
+		{
+			$oModuleController->insertModulePartConfig('schedule', $output->get('module_srl'), $list);
+		}
+
+		$this->setMessage($msg_code);
+		if ( Context::get('success_return_url') )
+		{
+			$this->setRedirectUrl(Context::get('success_return_url'));
+		}
+		else
+		{
+			$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminAdditionSetup', 'module_srl', $output->get('module_srl')));
 		}
 	}
 
 	function procScheduleAdminDeleteMid()
 	{
 		$module_srl = Context::get('module_srl');
-
-		$oModuleModel = getModel('module');
-		$module_info = $oModuleModel->getModuleInfoByModuleSrl($module_srl);
-
 		$oModuleController = getController('module');
 		$output = $oModuleController->deleteModule($module_srl);
 
@@ -81,14 +132,59 @@ class scheduleAdminController extends schedule
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDashboard'));
 	}
 
-	function procScheduleAdminDeleteNoModuleSrlSchedule()
+	function procScheduleAdminSaveCategorySettings()
 	{
-		$args = new stdClass();
-		$args->module_srl = 1;
-		$output = executeQuery('schedule.deleteNoModuleSrlDeleted', $args);
+		$module_srl = Context::get('module_srl');
+		$module_info = ModuleModel::getModuleInfoByModuleSrl($module_srl);
 
-		$this->setMessage('success_deleted');
-		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDeleteNoModuleSrlSchedule'));
+		$mid = Context::get('mid');
+		if ( $module_info->mid != $mid )
+		{
+			throw new Rhymix\Framework\Exceptions\InvalidRequest;
+		}
+
+		$module_info->hide_category = Context::get('hide_category') == 'Y' ? 'Y' : 'N';
+		$module_info->allow_no_category = Context::get('allow_no_category') == 'Y' ? 'Y' : 'N';
+
+		$oModuleController = getController('module');
+		$output = $oModuleController->updateModule($module_info);
+		if ( !$output->toBool() )
+		{
+			return $output;
+		}
+
+		$this->setMessage('success_updated');
+		if ( Context::get('success_return_url') )
+		{
+			$this->setRedirectUrl(Context::get('success_return_url'));
+		}
+		else
+		{
+			$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminCategoryInfo', 'module_srl', $output->get('module_srl')));
+		}
+	}
+
+	function deleteModuleSchedule($module_srl)
+	{
+		$args = new stdClass;
+		$args->list_count = 0;
+		$args->module_srl = intval($module_srl);
+		$schedule_list = executeQueryArray('schedule.getScheduleList', $args, array('schedule_srl'))->data;
+
+		// delete documents
+		$output = executeQuery('schedule.deleteModuleSchedule', $args);
+		if ( !$output->toBool() )
+		{
+			return $output;
+		}
+
+		// remove from cache
+		foreach ( $schedule_list as $schedule )
+		{
+			ScheduleController::clearScheduleCache($schedule->document_srl);
+		}
+
+		return new BaseObject();
 	}
 }
 /* End of file */

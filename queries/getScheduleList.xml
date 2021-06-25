@@ -1,12 +1,38 @@
 <query id="getScheduleList" action="select">
 	<tables>
-		<table name="schedule_list" />
+		<table name="schedules" />
 	</tables>
 	<columns>
 		<column name="*" />
 	</columns>
 	<conditions>
-		<condition operation="equal" column="selected_date" var="selected_date" />
-		<condition operation="equal" column="module_srl" var="module_srl" pipe="and" />
-	</conditions> 
+		<condition operation="in" column="module_srl" var="module_srl" filter="number" />
+		<condition operation="notin" column="module_srl" var="exclude_module_srl" filter="number" pipe="and" />
+		<condition operation="in" column="category_srl" var="category_srl" pipe="and" />
+		<condition operation="in" column="member_srl" var="member_srl" pipe="and" />
+		<condition operation="like" column="selected_date" var="selected_date" />
+		<condition operation="equal" column="status" var="status" pipe="and" />
+		<condition operation="equal" column="is_allday" var="is_allday" pipe="and" />
+        <group pipe="and">
+            <condition operation="more" column="list_order" var="division" pipe="and" />
+            <condition operation="below" column="list_order" var="last_division" pipe="and" />
+        </group>
+        <group pipe="and">
+            <condition operation="search" column="title" var="s_title" />
+            <condition operation="search" column="content" var="s_content" pipe="or" />
+            <condition operation="like_prefix" column="nick_name" var="s_nick_name" pipe="or" />
+            <condition operation="like" column="email_address" var="s_email_address" pipe="or" />
+            <condition operation="equal" column="member_srl" var="s_member_srl" pipe="or" />
+            <condition operation="like_prefix" column="regdate" var="s_regdate" pipe="or" />
+            <condition operation="like_prefix" column="start_date" var="s_start_date" pipe="or" />
+            <condition operation="like_prefix" column="end_date" var="s_end_date" pipe="or" />
+            <condition operation="like" column="place" var="place" pipe="or" />
+        </group>
+	</conditions>
+	<navigation>
+        <index var="sort_index" default="list_order" order="order_type" />
+        <list_count var="list_count" default="20" />
+        <page_count var="page_count" default="10" />
+        <page var="page" default="1" />
+    </navigation>
 </query>

@@ -1,22 +1,26 @@
 <?php
 
-require_once(_XE_PATH_ . 'modules/schedule/schedule.view.php');
-
 class scheduleMobile extends scheduleView
 {
 	function init()
 	{
-		$oScheduleModel = getModel('schedule');
-
-		$module_config = $oScheduleModel->getConfig();
-
-		Context::set('module_config', $module_config);
-
-		$template_path = sprintf('%sm.skins/%s/', $this->module_path, $this->module_info->mskin);
-		if (!(is_dir($template_path) && $this->module_info->mskin))
+		$skin = $this->module_info->skin;
+		$mskin = $this->module_info->mskin;
+		if ( $mskin === '/USE_RESPONSIVE/' )
 		{
-			$this->module_info->mskin = 'default';
-			$template_path = sprintf('%sm.skins/%s/', $this->module_path, $this->module_info->mskin);
+			$template_path = sprintf('%sskins/%s/', $this->module_path, $skin);
+			if ( !is_dir($template_path) || !$skin )
+			{
+				$template_path = sprintf('%sskins/%s/',$this->module_path, 'default');
+			}
+		}
+		else
+		{
+			$template_path = sprintf('%sm.skins/%s/', $this->module_path, $mskin);
+			if ( !is_dir($template_path) || !$mskin )
+			{
+				$template_path = sprintf('%sm.skins/%s/', $this->module_path, 'default');
+			}
 		}
 
 		$this->setTemplatePath($template_path);

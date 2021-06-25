@@ -1,0 +1,27 @@
+<table name="schedules">
+	<column name="schedule_srl" type="number" size="11" notnull="notnull" primary_key="primary_key" index="idx_schedule_srl" />
+	<column name="module_srl" type="number" size="11" default="0" notnull="notnull" index="idx_module_srl" />
+	<column name="category_srl" type="number" size="11" default="0" notnull="notnull" index="idx_category_srl" />
+
+	<column name="title" type="varchar" size="250" notnull="notnull" />
+	<column name="title_color" type="varchar" size="7" />
+	<column name="content" type="bigtext" />
+	<column name="regdate" type="date" index="idx_regdate" />
+	<column name="status" type="varchar" size="20" default="STANDBY" />
+	<column name="uploaded_count" type="number" size="11" default="0" notnull="notnull" index="idx_uploaded_count" />
+
+	<column name="start_date" type="varchar" size="8" notnull="notnull" />
+	<column name="start_time" type="varchar" size="4" notnull="notnull" />
+	<column name="end_date" type="varchar" size="8" notnull="notnull" />
+	<column name="end_time" type="varchar" size="4" notnull="notnull" />
+    <column name="is_allday" type="char" size="1" default="N" notnull="notnull" />
+    <column name="is_recurrence" type="char" size="1" default="N" notnull="notnull" />
+	<column name="selected_date" type="bigtext" notnull="notnull" />
+	<column name="place" type="varchar" size="250" notnull="notnull" />
+
+	<column name="list_order" type="number" size="11" notnull="notnull" index="idx_list_order" />
+    <column name="nick_name" type="varchar" size="80" notnull="notnull" index="idx_nick_name" />
+    <column name="member_srl" type="number" size="11" notnull="notnull" index="idx_member_srl" />
+    <column name="email_address" type="varchar" size="250" notnull="notnull" />
+	<column name="password" type="varchar" size="60" />
+</table>

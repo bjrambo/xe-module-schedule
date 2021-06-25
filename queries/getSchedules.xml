@@ -1,0 +1,16 @@
+<query id="getSchedules" action="select">
+	<tables>
+		<table name="schedules" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="in" column="schedule_srl" var="schedule_srls" />
+		<condition operation="in" column="module_srl" var="module_srl" filter="number" />
+		<condition operation="in" column="category_srl" var="category_srl" pipe="and" />
+		<condition operation="in" column="member_srl" var="member_srl" pipe="and" />
+		<condition operation="like" column="selected_date" var="selected_date" />
+		<condition operation="equal" column="status" var="status" pipe="and" />
+	</conditions> 
+</query>

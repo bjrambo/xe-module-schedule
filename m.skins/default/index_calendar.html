@@ -1,0 +1,66 @@
+<div class="schedule_monthly" id="{$year.$month}">
+	<div class="schedule_monthly_header">
+		<div loop="$lang->weekdays => $key, $name" class="{$key}"|cond="in_array($key, array('sunday', 'saturday'))">{mb_substr($name, 0, 1)}</div>
+	</div>
+	<div class="schedule_monthly_body">
+	<!--@for($date = 1, $weekday = 0, $week_time = 0; $date <= $date_info->day_max; $date++)-->
+		<!--@if($weekday % 7 == 0)-->
+		{@ $date--; $week_time++; }
+		<div class="schedule_weekly" id="{$year.$month}-week{$week_time}">
+		<!--@endif-->
+		<!--@for($i = 0; $i < 7; $i++)-->
+			<!--@if(($week_time == 1 && $week_time * $i >= $date_info->week_start) || ($week_time > 1 && $date < $date_info->day_max))-->
+			{@ $date++; $_date = sprintf('%02d', $date); $specialdays = $specialday_list[$date]; }
+			<div class="schedule_daily_wrapper schedule_daily<!--@if($month.$_date == date('md') || ($month != date('m') && $date == 1))--> this_day<!--@end-->" id="{$year.$month}-day{$_date}">
+				<div class="schedule_daily_header">
+					<div class="sunday"|cond="$i == 0 || (is_array($specialday_list[$date]) && array_key_exists('holiday', $specialday_list[$date]))" class="saturday"|cond="$i == 6">
+						<a href="{getUrl('schedule_srl', '', 'selected_month', $year.$month, 'selected_day', $_date, 'act', 'dispScheduleInsert')}">
+							{$date}
+							<div class="head_info">
+								<span class="lunarday<!--@if($i == 0 || $month.$_date == date('md') || ($month != date('m') && $date == 1))--> visible<!--@end-->" cond="$module_info->use_lunarday == 'Y'">{$lunarday_list[$date]->lunar_month/1}/{$lunarday_list[$date]->lunar_day/1} </span>
+								<span class="divisions" cond="$module_info->use_divisions == 'Y' && $divisions_list[$date]">{$divisions_list[$date]->title}</span>
+							</div>
+						</a>
+					</div>
+				</div>
+				<div class="schedule_daily_body">
+					<div class="schedule_day">
+				<!--@foreach($info_list as $val)-->
+					<!--@if(is_array($specialdays[$val]))-->
+						<!--@foreach($specialdays[$val] as $v)-->
+						<div class="schedule_list<!--@if($val == 'holiday')--> holiday<!--@else--> etc_day<!--@end-->" title="{$v->title}">
+							{(!$v->is_sequence || $weekday % 7 == 0)?$v->title:'&nbsp;'}
+							<span class="schedule_sequence" cond="$v->is_sequence && $weekday % 7 > 0"></span>
+						</div>
+						<!--@endforeach-->
+					<!--@end-->
+				<!--@endforeach-->
+				<!--@if(is_array($schedule_list[$date]))-->
+					<!--@foreach($schedule_list[$date] as $key => $schedule)-->
+						{@ $color_cond = $schedule->get('title_color') && $schedule->get('title_color') != 'transparent'; }
+						<div class="schedule_list schedule<!--@if($schedule->get('is_allday') == 'Y')--> is_allday<!--@end-->" style="background-color: {$schedule->get('title_color')};"|cond="$schedule->get('is_allday') == 'Y' && $color_cond" title="{$schedule->alt_title}">
+							<span class="schedule_color" style="background-color: {$schedule->get('title_color')};"|cond="$color_cond" cond="$schedule->get('is_allday') != 'Y'"></span>
+						<!--@if(!$schedule->is_sequence || $weekday % 7 == 0)-->
+							<a href="{getUrl('schedule_srl', $schedule->schedule_srl)}"><span class="list">{$schedule->getTitleText()}</span></a>
+						<!--@else-->
+							<a href="{getUrl('schedule_srl', $schedule->schedule_srl)}"><span class="list"></span></a>
+							<span class="schedule_sequence"></span>
+						<!--@endif-->
+						</div>
+					<!--@endforeach-->
+				<!--@endif-->
+					</div>
+				</div>
+			</div>
+			<!--@else-->
+			<div class="schedule_daily_wrapper">
+			</div>
+			<!--@endif-->
+			{@ $weekday++; }
+		<!--@endfor-->
+		<!--@if($weekday % 7 == 0)-->
+		</div>
+		<!--@end-->
+	<!--@endfor-->
+	</div>
+</div>

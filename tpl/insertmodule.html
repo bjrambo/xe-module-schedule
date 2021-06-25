@@ -3,21 +3,24 @@
 <div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == 'modules/schedule/tpl/insertmodule/1'" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
 	<p>{$XE_VALIDATOR_MESSAGE}</p>
 </div>
-<form ruleset="insertmyschedule" class="x_form-horizontal" action="{Context::getRequestUri()}" method="post" >
+
+<form ruleset="insertmodule" class="x_form-horizontal" action="{Context::getRequestUri()}" method="post" >
+	<input type="hidden" name="is_admin_module" value="Y" cond="$module == 'admin'" />
 	<input type="hidden" name="module" value="schedule" />
 	<input type="hidden" name="module_srl" value="{$module_info->module_srl}" />
 	<input cond="$logged_info->is_admin != 'Y'" type="hidden" name="mid" value="{$module_info->mid}" />
 	<input type="hidden" name="act" value="procScheduleAdminInsertMid" />
+	<input type="hidden" name="success_return_url" value="{getRequestUriByServerEnviroment()}" />
 	<input type="hidden" name="page" value="{$page}" />
 	<input type="hidden" name="xe_validator_id" value="modules/schedule/tpl/insertmodule/1" />
-	
+
 	<section class="section">
-		<h1>{$lang->subtitle_primary}</h1>
-		
+		<h1>{$lang->cmd_setup}</h1>
+
 		<div cond="$logged_info->is_admin == 'Y'" class="x_control-group">
 			<label class="x_control-label" for="mid">{$lang->mid}</label>
 			<div class="x_controls">
-				<input type="text" name="mid" id="mid" value="m_schedule"|cond="!$module_info->mid" value="{$module_info->mid}"|cond="$module_info->mid" />
+				<input type="text" name="mid" id="mid" value="{$module_info->mid}" />
 				<a href="#about_mid" class="x_icon-question-sign" data-toggle="#about_mid">{$lang->help}</a>
 				<p id="about_mid" class="x_help-block" hidden="hidden">{$lang->about_mid}</p>
 			</div>
@@ -30,6 +33,47 @@
 				<p id="about_browser_title" class="x_help-block" hidden="hidden">{$lang->about_browser_title}</p>
 			</div>
 		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="module_category_srl">{$lang->module_category}</label>
+			<div class="x_controls">
+				<select name="module_category_srl" id="module_category_srl">
+					<option value="0">{$lang->notuse}</option>
+					<option loop="$module_categories => $key, $val" value="{$key}" selected="selected"|cond="$module_info->module_category_srl == $key">{$val->title}</option>
+				</select>
+				<a href="#module_category_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
+				<p id="module_category_help" class="x_help-block" hidden>{$lang->about_module_category}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="admin_mail">{$lang->admin_mail}</label>
+			<div class="x_controls">
+				<input type="text" name="admin_mail" id="admin_mail" value="{$module_info->admin_mail}" />
+				<a href="#admin_mail_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
+				<p id="admin_mail_help" class="x_help-block" hidden>{$lang->about_admin_mail}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label">{$lang->extra_day} {$lang->cmd_select}</label>
+			<div class="x_controls">
+				<label class="x_inline" for="use_lunarday"><input type="checkbox" name="use_lunarday" id="use_lunarday" value="Y" checked="checked"|cond="$module_info->use_lunarday == 'Y'" /> {$lang->lunarday}</label>
+				<label class="x_inline" for="use_holiday"><input type="checkbox" name="use_holiday" id="use_holiday" value="Y" checked="checked"|cond="$module_info->use_holiday == 'Y'" /> {$lang->holiday}</label>
+				<label class="x_inline" for="use_divisions"><input type="checkbox" name="use_divisions" id="use_divisions" value="Y" checked="checked"|cond="$module_info->use_divisions == 'Y'" /> {$lang->divisions}</label>
+				<label class="x_inline" for="use_sundry"><input type="checkbox" name="use_sundry" id="use_sundry" value="Y" checked="checked"|cond="$module_info->use_sundry == 'Y'" /> {$lang->sundry}</label>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="custom_text">{$lang->schedule_custom_insert}</label>
+			<div class="x_controls">
+				<textarea name="custom_day" id="custom_day" class="lang_code" rows="8" cols="42"><!--@if(strpos($module_info->custom_day, '$user_lang->') === false)-->{$module_info->custom_day}<!--@else-->{htmlspecialchars($module_info->custom_day)}<!--@end--></textarea>
+				<a href="#custom_day_help" class="x_icon-question-sign" data-toggle="#custom_day_help">{$lang->help}</a>
+				<p id="custom_day_help" class="x_help-block" hidden="hidden">{$lang->about_custom_day}</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<h1>{$lang->layout} | {$lang->skin}</h1>
+		
 		<div class="x_control-group">
 			<label class="x_control-label" for="layout_srl">{$lang->layout}</label>
 			<div class="x_controls">
@@ -54,23 +98,21 @@
 		<div class="x_control-group">
 			<label class="x_control-label" for="lang_header_text">{$lang->header_text}</label>
 			<div class="x_controls">
-				<textarea name="header_text" id="header_text" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_header_text}"><!--@if(strpos($module_info->header_text, '$user_lang->') === false)-->{$module_info->header_text}<!--@else-->{htmlspecialchars($module_info->header_text)}<!--@end--></textarea>
-				<a href="#about_header_text" class="x_icon-question-sign" data-toggle="#about_header_text">{$lang->help}</a>
-				<p id="about_header_text" class="x_help-block" hidden="hidden">{$lang->about_header_text}</p>
+				<textarea name="header_text" id="header_text" class="lang_code" rows="8" cols="42">{$module_info->header_text}</textarea>
+				<p id="header_text_help" class="x_help-block">{$lang->about_header_text}</p>
 			</div>
 		</div>
 		<div class="x_control-group">
 			<label class="x_control-label" for="lang_footer_text">{$lang->footer_text}</label>
 			<div class="x_controls">
-				<textarea name="footer_text" id="footer_text" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_footer_text}"><!--@if(strpos($module_info->footer_text, '$user_lang->') === false)-->{$module_info->footer_text}<!--@else-->{htmlspecialchars($module_info->footer_text)}<!--@end--></textarea>
-				<a href="#about_footer_text" class="x_icon-question-sign" data-toggle="#about_footer_text">{$lang->help}</a>
-				<p id="about_footer_text" class="x_help-block" hidden="hidden">{$lang->about_footer_text}</p>
+				<textarea name="footer_text" id="footer_text" class="lang_code" rows="8" cols="42">{$module_info->footer_text}</textarea>
+				<p id="footer_text_help" class="x_help-block">{$lang->about_footer_text}</p>
 			</div>
 		</div>
 	</section>
 	
-	<section class="section">
-		<h1>{$lang->mobile_settings}</h1>
+	<section class="section" cond="Mobile::isMobileEnabled()">
+		<h1>{$lang->mobile_layout} | {$lang->mobile_skin}</h1>
 		
 		<div class="x_control-group">
 			<label class="x_control-label">{$lang->mobile_view}</label>
@@ -99,58 +141,71 @@
 				<p id="about_mobile_skin" class="x_help-block" hidden="hidden">{$lang->about_skin}</p>
 			</div>
 		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="lang_mobile_header_text">{$lang->mobile_header_text}</label>
+			<div class="x_controls">
+				<textarea name="mobile_header_text" id="mobile_header_text" class="lang_code" rows="8" cols="42">{$module_info->mobile_header_text}</textarea>
+				<p id="mobile_header_text_help" class="x_help-block">{$lang->about_mobile_header_text}</p>
+			</div>
+		</div>
+		<div class="x_control-group">
+			<label class="x_control-label" for="lang_mobile_footer_text">{$lang->mobile_footer_text}</label>
+			<div class="x_controls">
+				<textarea name="mobile_footer_text" id="mobile_footer_text" class="lang_code" rows="8" cols="42">{$module_info->mobile_footer_text}</textarea>
+				<p id="mobile_footer_text_help" class="x_help-block">{$lang->about_mobile_footer_text}</p>
+			</div>
+		</div>
 	</section>
-	
-	<section class="section">
-		<h1>고급기능</h1>
-		<div class="x_control-group">
-			<label class="x_control-label" for="lang_header_text">{$lang->header_text}</label>
-			<div class="x_controls">
-				<textarea name="header_text" id="header_text" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_header_text}"><!--@if(strpos($module_info->header_text, '$user_lang->') === false)-->{$module_info->header_text}<!--@else-->{htmlspecialchars($module_info->header_text)}<!--@end--></textarea>
-				<a href="#header_text_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
-				<p id="header_text_help" class="x_help-block" hidden>{$lang->about_header_text}</p>
-			</div>
-		</div>
-		<div class="x_control-group">
-			<label class="x_control-label" for="lang_header_text">{$lang->header_text} 모바일용</label>
-			<div class="x_controls">
-				<textarea name="header_text_m" id="header_text_m" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_header_text_m}"><!--@if(strpos($module_info->header_text_m, '$user_lang->') === false)-->{$module_info->header_text_m}<!--@else-->{htmlspecialchars($module_info->header_text_m)}<!--@end--></textarea>
 
+	<section class="section">
+		<h1>{$lang->subtitle_advanced}</h1>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{$lang->captcha}</label>
+			<div class="x_controls">
+				<label class="x_inline" for="use_captcha"><input type="checkbox" name="use_captcha" id="use_captcha" value="Y" checked="checked"|cond="$module_info->use_captcha == 'Y'" /> {$lang->use_captcha}</label>
+				<p class="x_help-block">{sprintf($lang->about_use_captcha, getUrl('', 'module', 'admin', 'act', 'dispSpamfilterAdminConfigCaptcha'))}</p>
 			</div>
 		</div>
 		<div class="x_control-group">
-			<label class="x_control-label" for="lang_list_text">안내사항 문구</label>
+			<label class="x_control-label">{$lang->set_status}</label>
 			<div class="x_controls">
-				<textarea name="list_text" id="list_text" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_list_text}"><!--@if(strpos($module_info->list_text, '$user_lang->') === false)-->{$module_info->list_text}<!--@else-->{htmlspecialchars($module_info->list_text)}<!--@end--></textarea>
+				<label loop="$lang->status_list => $key, $val" class="x_inline" for="{$key}"><input type="radio" name="set_status" id="{$key}" value="{$key}" checked|cond="$module_info->set_status == $key || (!$module_info->set_status && $key == 'STANDBY')" /> {$val}</label>
+				<label class="x_inline" for="OPTION"><input type="radio" name="set_status" id="OPTION" value="OPTION" checked|cond="$module_info->set_status == 'OPTION'" /> {$lang->author} {$lang->cmd_select}</label>
+				<p class="x_help-block">{$lang->about_status_option}</p>
 			</div>
 		</div>
 		<div class="x_control-group">
-			<label class="x_control-label" for="lang_list_text">안내사항 문구 모바일용</label>
+			<label class="x_control-label">{$lang->standby_display}</label>
 			<div class="x_controls">
-				<textarea name="list_text_m" id="list_text_m" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_list_text_m}"><!--@if(strpos($module_info->list_text_m, '$user_lang->') === false)-->{$module_info->list_text_m}<!--@else-->{htmlspecialchars($module_info->list_text_m)}<!--@end--></textarea>
+				<label loop="$lang->standby_displays => $key, $val" class="x_inline" for="{$key}"><input type="radio" name="standby_display" id="{$key}" value="{$key}" checked|cond="$module_info->standby_display == $key || (!$module_info->standby_display && $key == 'SHOW')" /> {$val}</label>
+				<p class="x_help-block">{$lang->about_standby_display}</p>
 			</div>
 		</div>
 		<div class="x_control-group">
-			<label class="x_control-label" for="lang_footer_text">{$lang->footer_text}</label>
+			<label class="x_control-label">{$lang->set_private}</label>
 			<div class="x_controls">
-				<textarea name="footer_text" id="footer_text" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_footer_text}"><!--@if(strpos($module_info->footer_text, '$user_lang->') === false)-->{$module_info->footer_text}<!--@else-->{htmlspecialchars($module_info->footer_text)}<!--@end--></textarea>
-				<a href="#footer_text_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
-				<p id="footer_text_help" class="x_help-block" hidden>{$lang->about_footer_text}</p>
+				<label class="x_inline" for="use_private"><input type="checkbox" name="use_private" id="use_private" value="Y" checked="checked"|cond="$module_info->use_private == 'Y'" /> {$lang->use_private}</label>
+				<p class="x_help-block">{$lang->about_use_private}</p>
+			</div>
+		</div>
+		<div class="x_control-group" style="display: none;">
+			<label class="x_control-label" for="reservation">{$lang->reservation}</label>
+			<div class="x_controls">
 			</div>
 		</div>
 		<div class="x_control-group">
-			<label class="x_control-label" for="lang_footer_text">{$lang->footer_text} 모바일용</label>
+			<label class="x_control-label">{$lang->cmd_list} {$lang->cmd_view}</label>
 			<div class="x_controls">
-				<textarea name="footer_text_m" id="footer_text_m" class="lang_code" rows="8" cols="42" placeholder="{$lang->about_footer_text_m}"><!--@if(strpos($module_info->footer_text_m, '$user_lang->') === false)-->{$module_info->footer_text_m}<!--@else-->{htmlspecialchars($module_info->footer_text_m)}<!--@end--></textarea>
-				<a href="#footer_text_m_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
-				<p id="footer_text_m_help" class="x_help-block" hidden>{$lang->about_footer_text_m}</p>
+				<label class="x_inline" for="use_list"><input type="checkbox" name="use_list" id="use_list" value="Y" checked="checked"|cond="$module_info->use_list == 'Y'" /> {$lang->use_list}</label>
+				<p class="x_help-block" cond="$module_info->module_srl">{sprintf($lang->about_use_list, getUrl('act', 'dispScheduleAdminAdditionSetup'), getUrl('', 'module', 'admin', 'act', 'dispScheduleAdminScheduleList', 'module_srl', $module_info->module_srl))}</p>
 			</div>
 		</div>
 	</section>
 	
 	<div class="btnArea x_clearfix">
-		<div class="x_pull-left">
-			<a href="{getUrl('', 'module', 'admin', 'act', 'dispGginstagramAdminDashboard')}" type="button" class="x_btn">{$lang->cmd_cancel}</a>
+		<div class="x_pull-left" cond="$mid">
+			<a href="{getUrl('', 'mid', $mid, 'list_style', $list_style)}" type="button" class="x_btn">{$lang->cmd_cancel}</a>
 		</div>
 		<div class="x_pull-right">
 			<button class="x_btn x_btn-primary" type="submit">{$lang->cmd_registration}</button>

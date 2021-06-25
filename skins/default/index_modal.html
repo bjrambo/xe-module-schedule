@@ -1,0 +1,72 @@
+<form class="modal_target" id="modal_search" action="{Context::getRequestUri()}" method="post">
+	<input type="hidden" name="mid" value="{$mid}"/>
+	<input type="hidden" name="category" value="{$category}" />
+	<input type="hidden" name="selected_month" value="{$selected_month}" />
+	<input type="hidden" name="schedule_srl" value="{$schedule_srl}" />
+	<input type="hidden" name="act" value="procScheduleMoveMonth" />
+	<div class="modal_target_container">
+		<h3>{$lang->cmd_search}<i class="xi xi-close"></i></h3>
+		<div class="modal_target_wrapper">
+			<div class="modal_target_selector" cond="!$is_mobile">
+				<select class="search_year" name="s_year">
+					{@ $c = date('Y');}
+					<!--@for($y = $c-10; $y <= $c+10; $y++)-->
+					<option value="{$y}" selected|cond="$y == $year">{$y}</option>
+					<!--@endfor-->
+				</select>
+				<span>{$lang->unit_year}</span>
+				<select class="search_month" name="s_month">
+					<!--@for($m = 1; $m <= 12; $m++)-->
+					<option value="{sprintf('%02d', $m)}" selected|cond="sprintf('%02d', $m) == $month">{$m}</option>
+					<!--@endfor-->
+				</select>
+				<span>{$lang->unit_month}</span>
+			</div>
+			<div class="modal_target_selector" cond="$is_mobile">
+				<input type="hidden" name="s_year" value="{$year}"/>
+				<div class="modal_item_picker" rel="search_year">
+					{@ $c = date('Y');}
+					<!--@for($y = $c-10; $y <= $c+10; $y++)-->
+					<div class="modal_item<!--@if($y == $year)--> selected<!--@end-->">{$y}<small>{$lang->unit_year}</small></div>
+					<!--@endfor-->
+				</div>
+				<input type="hidden" name="s_month" value="{$month}"/>
+				<div class="modal_item_picker" rel="search_month">
+					<!--@for($m = 1; $m <= 12; $m++)-->
+					<div class="modal_item<!--@if(sprintf('%02d', $m) == $month)--> selected<!--@end-->">{$m}<small>{$lang->unit_month}</small></div>
+					<!--@endfor-->
+				</div>
+			</div>
+			<div class="modal_target_commander">
+				<a href="javascript:void(0);" class="navi_btn btn_close">{$lang->cmd_cancel}</a>
+				<input type="submit" value="{$lang->cmd_search}" class="navi_btn btn_submit" />
+			</div>
+		</div>
+	</div>
+</form>
+
+<div class="modal_target" id="modal_category" data-current_category_srl="{$category}" cond="$is_mobile && $module_info->hide_category != 'Y' && $category_list">
+	<div class="modal_target_container">
+		<h3>{$lang->category} {$lang->cmd_select}<i class="xi xi-close"></i></h3>
+		<div class="modal_target_wrapper">
+			<div class="modal_target_selector">
+				<div class="modal_item_picker" rel="category_1st">
+					<div class="modal_item<!--@if(!$category)--> selected<!--@end-->" rel="{getUrl('', 'mid', $mid, 'selected_month', $selected_month)}" data-category_srl="0">{$lang->total}</div>
+					<!--@foreach($category_list as $srl => $val)-->
+					<div class="modal_item<!--@if($category == $srl || $val->expand)--> selected<!--@end-->" rel="{getUrl('', 'mid', $mid, 'category', $srl, 'selected_month', $selected_month)}" data-category_srl="{$srl}" style="color:{$val->color}"|cond="$val->color && $val->color != 'transparent'" cond="!$val->depth">{$val->title}</div>
+					<!--@endforeach-->
+				</div>
+				<div class="modal_item_picker" rel="category_2nd">
+					<div class="modal_item<!--@if(!$category)--> selected<!--@end-->" rel="0" data-parent_srl="0">{$lang->none_category}</div>
+					<!--@foreach($category_list as $srl => $val)-->
+					<div class="modal_item<!--@if($category == $srl)--> selected<!--@end-->" rel="{getUrl('', 'mid', $mid, 'category', $srl, 'selected_month', $selected_month)}" data-category_srl="{$srl}" data-parent_srl="{$val->parent_srl}" style="color:{$val->color}"|cond="$val->color && $val->color != 'transparent'" cond="$val->depth == 1">{$val->title}</div>
+					<!--@endforeach-->
+				</div>
+			</div>
+			<div class="modal_target_commander">
+				<a href="javascript:void(0);" class="navi_btn btn_close">{$lang->cmd_cancel}</a>
+				<a href="javascript:void(0);" class="navi_btn btn_submit">{$lang->cmd_move}</a>
+			</div>
+		</div>
+	</div>
+</div>
