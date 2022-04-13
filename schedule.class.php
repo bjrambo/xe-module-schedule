@@ -10,28 +10,34 @@ class schedule extends ModuleObject
 
 	var $triggers = array(
 		array('module.deleteModule', 'schedule', 'controller', 'triggerDeleteModuleSchedules', 'after'),
-		//array('schedule.insertSchedule', 'schedule', 'controller', 'triggerAttachFiles', 'after'),
 	);
 
 
 	function moduleInstall()
 	{
 		// Register action forward (to use in administrator mode)
-		$oModuleController = getController('module');
+		$oModuleController = moduleController::getInstance();
+		$oModuleModel = moduleModel::getInstance();
 
-		$oDB = &DB::getInstance();
+		$oDB = DB::getInstance();
 		$oDB->addIndex("schedules", "idx_uploaded_count", array("module_srl", "uploaded_count"));
 
-		$oModuleController->insertTrigger($trigger[0], $trigger[1], $trigger[2], $trigger[3], $trigger[4]);
-
+		foreach ($this->triggers as $trigger)
+		{
+			if(!$oModuleModel->getTrigger($trigger[0], $trigger[1], $trigger[2], $trigger[3], $trigger[4]))
+			{
+				$oModuleController->insertTrigger($trigger[0], $trigger[1], $trigger[2], $trigger[3], $trigger[4]);
+			}
+		}
+		
 		FileHandler::makeDir('./files/cache/schedule');
 		return new BaseObject();
 	}
 
 	function checkUpdate()
 	{
-		$oModuleModel = getModel('module');
-		$oDB = &DB::getInstance();
+		$oModuleModel = moduleModel::getInstance();
+		$oDB = DB::getInstance();
 
 		// 2021.02.20 Add a column(schedules) for getting thumbnails
 		if(!$oDB->isColumnExists('schedules', 'uploaded_count')) return true;
@@ -49,9 +55,9 @@ class schedule extends ModuleObject
 
 	function moduleUpdate()
 	{
-		$oModuleModel = getModel('module');
-		$oModuleController = getController('module');
-		$oDB = &DB::getInstance();
+		$oModuleModel = moduleModel::getInstance();
+		$oModuleController = moduleController::getInstance();
+		$oDB = DB::getInstance();
 
 		// 2021.02.20 Add a column(schedules) for getting thumbnails
 		if(!$oDB->isColumnExists('schedules', 'uploaded_count'))

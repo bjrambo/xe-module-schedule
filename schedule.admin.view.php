@@ -13,14 +13,14 @@ class scheduleAdminView extends schedule
 
 		if ( $module_srl )
 		{
-			$module_info = ModuleModel::getModuleInfoByModuleSrl($module_srl);
+			$module_info = moduleModel::getModuleInfoByModuleSrl($module_srl);
 			if ( !$module_info )
 			{
 				Context::set('module_srl', '');
 			}
 			else
 			{
-				ModuleModel::syncModuleToSite($module_info);
+				moduleModel::syncModuleToSite($module_info);
 				$module_info->mid_list = explode('|@|', $module_info->mid_list);
 				$module_info->notify_list = explode('|@|', $module_info->notify_list);
 				$this->module_info = $module_info;
@@ -32,10 +32,10 @@ class scheduleAdminView extends schedule
 			return $this->stop('msg_invalid_request');
 		}
 
-		$schedule_config = ScheduleModel::getScheduleConfig();
+		$schedule_config = scheduleModel::getScheduleConfig();
 		Context::set('schedule_config', $schedule_config);
 		
-		$module_categories = ModuleModel::getModuleCategories();
+		$module_categories = moduleModel::getModuleCategories();
 		Context::set('module_categories', $module_categories);
 
 		$order_target = array();
@@ -81,7 +81,7 @@ class scheduleAdminView extends schedule
 		}
 
 		$output = executeQueryArray('schedule.getScheduleMidList', $args);
-		ModuleModel::syncModuleToSite($output->data);
+		moduleModel::syncModuleToSite($output->data);
 
 		Context::set('page', $output->page);
 		Context::set('total_page', $output->total_page);
@@ -99,14 +99,13 @@ class scheduleAdminView extends schedule
 
 	function dispScheduleAdminScheduleList()
 	{
-		// option to get a list
 		$args = new stdClass();
-		$args->page = Context::get('page'); // /< Page
-		$args->list_count = 30; // /< the number of posts to display on a single page
-		$args->page_count = 5; // /< the number of pages that appear in the page navigation
+		$args->page = Context::get('page');
+		$args->list_count = 30;
+		$args->page_count = 5;
 		
-		$args->search_target = Context::get('search_target'); // /< search (title, contents ...)
-		$args->search_keyword = Context::get('search_keyword'); // /< keyword to search
+		$args->search_target = Context::get('search_target');
+		$args->search_keyword = Context::get('search_keyword');
 		if ( $args->search_target === 'member_srl' )
 		{
 			$logged_info = Context::get('logged_info');
@@ -121,14 +120,12 @@ class scheduleAdminView extends schedule
 		$args->module_srl = Context::get('module_srl');
 		$args->status = Context::get('status');
 
-		// get a list
 		$columnList = array('schedule_srl', 'module_srl', 'category_srl', 'title', 'regdate', 'status', 'uploaded_count', 'start_date', 'end_date', 'selected_date', 'is_allday', 'place', 'is_recurrence', 'nick_name', 'member_srl', 'email_address');
-		$output = ScheduleModel::getScheduleList($args, $columnList);
+		// TODO is it not static.
+		$output = scheduleModel::getScheduleList($args, $columnList);
 
-		// get Status name list
-		$status_list = ScheduleModel::getScheduleStatusList();
+		$status_list = scheduleModel::getScheduleStatusList();
 
-		// Set values of schedule_model::getScheduleList() objects for a template
 		Context::set('total_count', $output->total_count);
 		Context::set('total_page', $output->total_page);
 		Context::set('page', $output->page);
@@ -136,27 +133,27 @@ class scheduleAdminView extends schedule
 		Context::set('status_list', $status_list);
 		Context::set('page_navigation', $output->page_navigation);
 
-		// set a search option used in the template
+		// check again. change to foreach
 		$count_search_option = count($this->search_option);
 		for ( $i = 0; $i < $count_search_option; $i++ )
 		{
 			$search_option[$this->search_option[$i]] = lang($this->search_option[$i]);
 		}
+		
 		Context::set('search_option', $search_option);
 
-		// Module List
 		$module_list = array();
-		$mod_srls = array();
+		$module_srls = array();
 		foreach ( $output->data as $oSchedule )
 		{
-			$mod_srls[] = $oSchedule->get('module_srl');
+			$module_srls[] = $oSchedule->get('module_srl');
 		}
-		$mod_srls = array_unique($mod_srls);
-		$mod_srls_count = count($mod_srls);
-		if ( $mod_srls_count )
+		$module_srls = array_unique($module_srls);
+		$module_srls_count = count($module_srls);
+		if ( $module_srls_count )
 		{
 			$columnList = array('module_srl', 'mid', 'browser_title');
-			$module_output = ModuleModel::getModulesInfo($mod_srls, $columnList);
+			$module_output = moduleModel::getModulesInfo($module_srls, $columnList);
 			if ( $module_output && is_array($module_output) )
 			{
 				foreach ( $module_output as $module )
@@ -179,18 +176,18 @@ class scheduleAdminView extends schedule
 		}
 
 		// get the skins list
-		$skin_list = ModuleModel::getSkins($this->module_path);
+		$skin_list = moduleModel::getSkins($this->module_path);
 		Context::set('skin_list',$skin_list);
 
-		$mskin_list = ModuleModel::getSkins($this->module_path, 'm.skins');
+		$mskin_list = moduleModel::getSkins($this->module_path, 'm.skins');
 		Context::set('mskin_list', $mskin_list);
 
 		// get the layouts list
-		$oLayoutModel = getModel('layout');
-		$layout_list = $oLayoutModel->getLayoutList();
+		$oLayoutModel = layoutModel::getInstance();
+		$layout_list = $oLayoutModel->getLayoutInstanceList();
 		Context::set('layout_list', $layout_list);
 
-		$mobile_layout_list = $oLayoutModel->getLayoutList(0, 'M');
+		$mobile_layout_list = $oLayoutModel->getLayoutInstanceList(0, 'M');
 		Context::set('mlayout_list', $mobile_layout_list);
 
 		$security = new Security();
@@ -201,8 +198,7 @@ class scheduleAdminView extends schedule
 
 	function dispScheduleAdminCategoryInfo()
 	{
-		$oDocumentModel = getModel('document');
-		$category_content = $oDocumentModel->getCategoryHTML(Context::get('module_srl'));
+		$category_content = documentModel::getInstance()->getCategoryHTML(Context::get('module_srl'));
 		Context::set('category_content', $category_content);
 		Context::set('module_info', $this->module_info);
 	}
@@ -227,8 +223,8 @@ class scheduleAdminView extends schedule
 		if ( $this->module_info->use_list == 'Y' )
 		{
 			// setup the extra vaiables
-			Context::set('default_list_config', ScheduleModel::getDefaultListConfig($this->module_info->module_srl));
-			Context::set('list_config', ScheduleModel::getListConfig($this->module_info->module_srl));
+			Context::set('default_list_config', scheduleModel::getDefaultListConfig($this->module_info->module_srl));
+			Context::set('list_config', scheduleModel::getListConfig($this->module_info->module_srl));
 		}
 
 		$content = '';
@@ -254,7 +250,6 @@ class scheduleAdminView extends schedule
 	 **/
 	function dispScheduleAdminGrantInfo()
 	{
-		// get the grant infotmation from admin module
 		$oModuleAdminModel = getAdminModel('module');
 		$grant_content = $oModuleAdminModel->getModuleGrantHTML($this->module_info->module_srl, $this->xml_info->grant);
 		Context::set('grant_content', $grant_content);
@@ -264,7 +259,6 @@ class scheduleAdminView extends schedule
 	 * @brief display the module skin information
 	 **/
 	function dispScheduleAdminSkinInfo() {
-		 // get the grant infotmation from admin module
 		$oModuleAdminModel = getAdminModel('module');
 		$skin_content = $oModuleAdminModel->getModuleSkinHTML($this->module_info->module_srl);
 		Context::set('skin_content', $skin_content);
@@ -274,7 +268,6 @@ class scheduleAdminView extends schedule
 	 * Display the module mobile skin information
 	 **/
 	function dispScheduleAdminMobileSkinInfo() {
-		 // get the grant infotmation from admin module
 		$oModuleAdminModel = getAdminModel('module');
 		$skin_content = $oModuleAdminModel->getModuleMobileSkinHTML($this->module_info->module_srl);
 		Context::set('skin_content', $skin_content);

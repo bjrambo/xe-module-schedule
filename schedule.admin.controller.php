@@ -8,8 +8,8 @@ class scheduleAdminController extends schedule
 	function procScheduleAdminInsertMid()
 	{
 		$args = Context::getRequestVars();
-		$module_info = ModuleModel::getModuleInfoByModuleSrl($args->module_srl);
-		$oModuleController = getController('module');
+		$module_info = moduleModel::getModuleInfoByModuleSrl($args->module_srl);
+		$oModuleController = moduleController::getInstance();
 
 		$args->order_target = $module_info->order_target ? : 'list_order';
 		$args->order_type = $module_info->order_type ? : 'asc';
@@ -52,10 +52,11 @@ class scheduleAdminController extends schedule
 		$schedule_config = scheduleModel::getScheduleConfig();
 		$schedule_config->api = Context::get('api');
 
-		$oModuleController = getController('module');
+		$oModuleController = moduleController::getInstance();
 		$oModuleController->updateModuleConfig('schedule', $schedule_config);
 
 		$this->setMessage('success_updated');
+		//TODO change to setRedirectUri.
 		if(!in_array(Context::getRequestMethod(),array('XMLRPC','JSON')))
 		{
 			$returnUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminDashboard');
@@ -69,10 +70,9 @@ class scheduleAdminController extends schedule
 	 **/
 	function procScheduleAdminSetList($args = null)
 	{
-		// setup the schedule module infortmation
 		$args = Context::getRequestVars();
-		$module_info = ModuleModel::getModuleInfoByModuleSrl($args->module_srl);
-		$oModuleController = getController('module');
+		$module_info = moduleModel::getModuleInfoByModuleSrl($args->module_srl);
+		$oModuleController = moduleController::getInstance();
 
 		$module_info->order_target = $args->order_target;
 		$module_info->order_type = $args->order_type;
@@ -91,7 +91,6 @@ class scheduleAdminController extends schedule
 		$module_info->mobile_search_list_count = $args->mobile_search_list_count ? : 10;
 		$module_info->mobile_page_count = $args->mobile_page_count ? : 5;
 
-		// update the schedule module based on module_srl
 		$output = $oModuleController->updateModule($module_info);
 		$msg_code = 'success_updated';
 
@@ -100,7 +99,6 @@ class scheduleAdminController extends schedule
 			return $output;
 		}
 
-		// setup list config
 		$list = explode(',', $args->list);
 		if ( count($list) )
 		{
@@ -108,6 +106,7 @@ class scheduleAdminController extends schedule
 		}
 
 		$this->setMessage($msg_code);
+		
 		if ( Context::get('success_return_url') )
 		{
 			$this->setRedirectUrl(Context::get('success_return_url'));
@@ -136,7 +135,7 @@ class scheduleAdminController extends schedule
 	function procScheduleAdminSaveCategorySettings()
 	{
 		$module_srl = Context::get('module_srl');
-		$module_info = ModuleModel::getModuleInfoByModuleSrl($module_srl);
+		$module_info = moduleModel::getModuleInfoByModuleSrl($module_srl);
 
 		$mid = Context::get('mid');
 		if ( $module_info->mid != $mid )
@@ -147,7 +146,7 @@ class scheduleAdminController extends schedule
 		$module_info->hide_category = Context::get('hide_category') == 'Y' ? 'Y' : 'N';
 		$module_info->allow_no_category = Context::get('allow_no_category') == 'Y' ? 'Y' : 'N';
 
-		$oModuleController = getController('module');
+		$oModuleController = moduleController::getInstance();
 		$output = $oModuleController->updateModule($module_info);
 		if ( !$output->toBool() )
 		{
@@ -183,8 +182,7 @@ class scheduleAdminController extends schedule
 		// remove from cache
 		foreach ( $schedule_list as $schedule )
 		{
-			//TODO it is not static;
-			ScheduleController::clearScheduleCache($schedule->document_srl);
+			scheduleController::clearScheduleCache($schedule->document_srl);
 		}
 
 		return new BaseObject();

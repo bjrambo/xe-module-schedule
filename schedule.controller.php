@@ -17,8 +17,9 @@ class scheduleController extends schedule
 			throw new Rhymix\Framework\Exception('msg_not_permitted_to_write');
 		}
 
+		$is_logged = \Rhymix\Framework\Session::getMemberSrl();
+		
 		$schedule_srl = Context::get('schedule_srl');
-		$logged_info = Context::get('logged_info');
 
 		$obj = Context::getRequestVars();
 		$obj->module_srl = $this->module_info->module_srl;
@@ -27,12 +28,13 @@ class scheduleController extends schedule
 		if ( $this->module_info->use_captcha ==='Y' )
 		{
 			$spamfilter_config = ModuleModel::getModuleConfig('spamfilter');
+			// What is this? TODO check again
 			if (
 				isset($spamfilter_config) && isset($spamfilter_config->captcha)
 				&& $spamfilter_config->captcha->type === 'recaptcha'
 				&& $spamfilter_config->captcha->target_actions['document']
-				&& $logged_info->is_admin !== 'Y'
-				&& ( $spamfilter_config->captcha->target_users === 'everyone' || !$logged_info->member_srl )
+				&& !$this->user->isAdmin()
+				&& ( $spamfilter_config->captcha->target_users === 'everyone' || !$this->user->member_srl )
 				&& ( $spamfilter_config->captcha->target_frequency === 'every_time' || !isset($_SESSION['recaptcha_authenticated']) || !$_SESSION['recaptcha_authenticated'] )
 				&& ( $spamfilter_config->captcha->target_devices[Mobile::isFromMobilePhone() ? 'mobile' : 'pc'] )
 			)
@@ -52,6 +54,7 @@ class scheduleController extends schedule
 		$args->content = $obj->content;
 		$args->status = $obj->status;
 
+		// allday 는 하루종일 스케줄을 뜻하는 것.
 		$args->start_date = preg_replace('/[^0-9]*/s', '', $obj->start_date);
 		$args->start_time = ($obj->is_allday != 'Y') ? preg_replace('/[^0-9]*/s', '', $obj->start_time) : '0000';
 		$args->end_date = preg_replace('/[^0-9]*/s', '', $obj->end_date);
@@ -91,17 +94,18 @@ class scheduleController extends schedule
 		$oDB = DB::getInstance();
 		$oDB->begin();
 
-		$oSchedule = ScheduleModel::getSchedule($schedule_srl);
+		// Todo is not static.
+		$oSchedule = scheduleModel::getSchedule($schedule_srl);
 		if ( !$oSchedule )
 		{
 			$args->schedule_srl = $schedule_srl ? : getNextSequence();
 			$args->list_order = $args->schedule_srl * -1;
 			$args->regdate = date('YmdHis');
-			if ( $logged_info )
+			if ($is_logged)
 			{
-				$args->nick_name = htmlspecialchars_decode($logged_info->nick_name);
-				$args->member_srl = $logged_info->member_srl;
-				$args->email_address = $logged_info->email_address;
+				$args->nick_name = htmlspecialchars_decode($this->user->nick_name);
+				$args->member_srl = $this->user->member_srl;
+				$args->email_address = $this->user->email_address;
 			}
 			else
 			{
@@ -110,8 +114,8 @@ class scheduleController extends schedule
 				$args->email_address = $obj->email_address;
 				if ( $obj->password && !$obj->password_is_hashed )
 				{
-					$oMemberModel = getModel('member');
-					$args->password = $oMemberModel->hashPassword($obj->password);
+					$oMemberModel = memberModel::getInstance();
+					$args->password = $oMemberModel::hashPassword($obj->password);
 				}
 			}
 
@@ -174,11 +178,11 @@ class scheduleController extends schedule
 			}
 			else
 			{
-				if ( $logged_info )
+				if ( $is_logged )
 				{
-					$args->nick_name = htmlspecialchars_decode($logged_info->nick_name);
-					$args->member_srl = $logged_info->member_srl;
-					$args->email_address = $logged_info->email_address;
+					$args->nick_name = htmlspecialchars_decode($this->user->nick_name);
+					$args->member_srl = $this->user->member_srl;
+					$args->email_address = $this->user->email_address;
 				}
 				else
 				{
@@ -194,6 +198,7 @@ class scheduleController extends schedule
 			}
 
 			$output = executeQuery('schedule.updateSchedule', $args);
+			// 수정하면 안되나요?
 			$this->deleteScheduleRecur($args->schedule_srl);
 			if ( $args->is_recurrence == 'Y' )
 			{
@@ -232,10 +237,7 @@ class scheduleController extends schedule
 		$this->add('schedule_srl', $args->schedule_srl);
 		$this->add('category_srl', $args->category_srl);
 
-		if ( !in_array(Context::getRequestMethod(), array('XMLRPC', 'JSON')) )
-		{
-			$this->setRedirectUrl($redirectUrl);
-		}
+		$this->setRedirectUrl($redirectUrl);
 	}
 
 	function deleteSavedDoc()
@@ -265,11 +267,12 @@ class scheduleController extends schedule
 			return;
 		}
 
-		$oSaved = ScheduleModel::getSchedule($saved_doc->document_srl);
+		// why get?
+		$oSaved = scheduleModel::getSchedule($saved_doc->document_srl);
 		return executeQuery('editor.deleteSavedDoc', $args);
 	}
 
-	function clearScheduleCache($schedule_srl)
+	public static function clearScheduleCache($schedule_srl)
 	{
 		Rhymix\Framework\Cache::delete('schedule_item:recur_info' . getNumberingPath($schedule_srl) . $schedule_srl);
 		Rhymix\Framework\Cache::delete('schedule_item:basic_info' . getNumberingPath($schedule_srl) . $schedule_srl);
@@ -463,10 +466,12 @@ class scheduleController extends schedule
 						// 제외 설정이 있을 경우 가져와서 적용
 						if ( $exception_type )
 						{
-							$is_holiday = ScheduleModel::isHoliday($date);
+							// TODO it is not static
+							$is_holiday = scheduleModel::isHoliday($date);
 							if ( $has_holiday && $is_holiday )
 							{
-								switch ( $exception_option ) {
+								switch ( $exception_option )
+								{
 									case 'prev_week':
 										$_step = '-1 week';
 										break;
@@ -477,9 +482,10 @@ class scheduleController extends schedule
 										$candidate = strtotime($step, $candidate);
 										continue 2;
 								}
+								
+								// TODO it is not static
 								$_date = date($output_format, strtotime($_step, $candidate));
-
-								while ( ScheduleModel::isHoliday($_date) )
+								while ( scheduleModel::isHoliday($_date) )
 								{
 									$_date = date($output_format, strtotime($_date . ' ' . $_step));
 								}
@@ -567,7 +573,7 @@ class scheduleController extends schedule
 						// 제외 설정이 있을 경우 가져와서 적용
 						if ( $exception_type )
 						{
-							$is_holiday = ScheduleModel::isHoliday($date);
+							$is_holiday = scheduleModel::isHoliday($date);
 							if ( $has_holiday && $is_holiday )
 							{
 								switch ( $exception_option ) {
@@ -584,7 +590,7 @@ class scheduleController extends schedule
 								}
 								$_date = date($output_format, strtotime($_step, $candidate));
 
-								while ( ScheduleModel::isHoliday($_date) )
+								while ( scheduleModel::isHoliday($_date) )
 								{
 									$_date = date($output_format, strtotime($_date . ' ' . $_step));
 								}
@@ -616,9 +622,9 @@ class scheduleController extends schedule
 					{
 						$date = date($output_format, $candidate);
 
-						$lunar_date = ScheduleModel::getLunarFromSolar($date);
+						$lunar_date = scheduleModel::getLunarFromSolar($date);
 						$_lunar_date = (int)$lunar_date->year + 1 . $lunar_date->month . $lunar_date->day;
-						$next_solar_date = ScheduleModel::getSolarFromLunar($_lunar_date);
+						$next_solar_date = scheduleModel::getSolarFromLunar($_lunar_date);
 
 						if ( in_array($date, $dates) )
 						{
@@ -628,9 +634,9 @@ class scheduleController extends schedule
 						// 제외 설정이 있을 경우 가져와서 적용
 						if ( $exception_type )
 						{
-							$is_holiday = ScheduleModel::isHoliday($date);
-							$is_saturday = ScheduleModel::isSaturday($date);
-							$is_sunday = ScheduleModel::isSunday($date);
+							$is_holiday = scheduleModel::isHoliday($date);
+							$is_saturday = scheduleModel::isSaturday($date);
+							$is_sunday = scheduleModel::isSunday($date);
 
 							if ( ($has_holiday && $is_holiday) || ($has_saturday && $is_saturday) || ($has_sunday && $is_sunday) )
 							{
@@ -653,49 +659,49 @@ class scheduleController extends schedule
 
 								if ( $has_holiday && !$has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) )
+									while ( scheduleModel::isHoliday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
@@ -731,9 +737,9 @@ class scheduleController extends schedule
 					{
 						$date = date($output_format, $candidate);
 
-						$lunar_date = ScheduleModel::getLunarFromSolar($date);
+						$lunar_date = scheduleModel::getLunarFromSolar($date);
 						$_lunar_date = (int)$lunar_date->year + 1 . $lunar_date->month . $lunar_date->day;
-						$next_solar_date = ScheduleModel::getSolarFromLunar($_lunar_date);
+						$next_solar_date = scheduleModel::getSolarFromLunar($_lunar_date);
 
 						if ( in_array($date, $dates) )
 						{
@@ -743,9 +749,9 @@ class scheduleController extends schedule
 						// 제외 설정이 있을 경우 가져와서 적용
 						if ( $exception_type )
 						{
-							$is_holiday = ScheduleModel::isHoliday($date);
-							$is_saturday = ScheduleModel::isSaturday($date);
-							$is_sunday = ScheduleModel::isSunday($date);
+							$is_holiday = scheduleModel::isHoliday($date);
+							$is_saturday = scheduleModel::isSaturday($date);
+							$is_sunday = scheduleModel::isSunday($date);
 
 							if ( ($has_holiday && $is_holiday) || ($has_saturday && $is_saturday) || ($has_sunday && $is_sunday) )
 							{
@@ -768,49 +774,49 @@ class scheduleController extends schedule
 
 								if ( $has_holiday && !$has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) )
+									while ( scheduleModel::isHoliday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
@@ -855,9 +861,9 @@ class scheduleController extends schedule
 						// 제외 설정이 있을 경우 가져와서 적용
 						if ( $exception_type )
 						{
-							$is_holiday = ScheduleModel::isHoliday($date);
-							$is_saturday = ScheduleModel::isSaturday($date);
-							$is_sunday = ScheduleModel::isSunday($date);
+							$is_holiday = scheduleModel::isHoliday($date);
+							$is_saturday = scheduleModel::isSaturday($date);
+							$is_sunday = scheduleModel::isSunday($date);
 
 							if ( ($has_holiday && $is_holiday) || ($has_saturday && $is_saturday) || ($has_sunday && $is_sunday) )
 							{
@@ -881,49 +887,49 @@ class scheduleController extends schedule
 
 								if ( $has_holiday && !$has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) )
+									while ( scheduleModel::isHoliday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
@@ -961,9 +967,9 @@ class scheduleController extends schedule
 						// 제외 설정이 있을 경우 가져와서 적용
 						if ( $exception_type )
 						{
-							$is_holiday = ScheduleModel::isHoliday($date);
-							$is_saturday = ScheduleModel::isSaturday($date);
-							$is_sunday = ScheduleModel::isSunday($date);
+							$is_holiday = scheduleModel::isHoliday($date);
+							$is_saturday = scheduleModel::isSaturday($date);
+							$is_sunday = scheduleModel::isSunday($date);
 
 							if ( ($has_holiday && $is_holiday) || ($has_saturday && $is_saturday) || ($has_sunday && $is_sunday) )
 							{
@@ -987,49 +993,49 @@ class scheduleController extends schedule
 
 								if ( $has_holiday && !$has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) )
+									while ( scheduleModel::isHoliday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && !$has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) )
+									while ( scheduleModel::isSaturday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( !$has_holiday && !$has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
 								}
 								else if ( $has_holiday && $has_saturday && $has_sunday )
 								{
-									while ( ScheduleModel::isHoliday($_date) || ScheduleModel::isSaturday($_date) || ScheduleModel::isSunday($_date) )
+									while ( scheduleModel::isHoliday($_date) || scheduleModel::isSaturday($_date) || scheduleModel::isSunday($_date) )
 									{
 										$_date = date($output_format, strtotime($_date . ' ' . $_step));
 									}
@@ -1065,7 +1071,13 @@ class scheduleController extends schedule
 		return implode(',', $dates);
 	}
 
-	// Recurrence Option Insert
+	/**
+	 * Recurrence Option Insert
+	 * @param $schedule_srl
+	 * @param $recur_option
+	 * @return void
+	 * @throws \Rhymix\Framework\Exception
+	 */
 	function insertScheduleRecur($schedule_srl, $recur_option = array())
 	{
 		if ( !$schedule_srl || !$recur_option['recur_cycle'] || !isset($recur_option['recur_unit']) )
@@ -1081,13 +1093,18 @@ class scheduleController extends schedule
 			{
 				$val = preg_replace('/[^0-9]*/s', '', $val);
 			}
-			$args->$key = $val;
+			$args->{$key} = $val;
 		}
 
 		executeQuery('schedule.insertScheduleRecur', $args);
 	}
 
-	// Recurrence Option Delete
+	/**
+	 * Recurrence Option Delete
+	 * @param $schedule_srl
+	 * @return void
+	 * @throws \Rhymix\Framework\Exception
+	 */
 	function deleteScheduleRecur($schedule_srl)
 	{
 		if ( !$schedule_srl )
@@ -1104,16 +1121,17 @@ class scheduleController extends schedule
 	/**
 	 * A trigger to delete all posts together when the module is deleted
 	 * @param object $obj
-	 * @return Object
+	 * @return BaseObject
 	 */
 	function triggerDeleteModuleSchedules(&$obj)
 	{
 		$module_srl = $obj->module_srl;
 		if ( !$module_srl )
 		{
-			return;
+			return new BaseObject();
 		}
 
+		// TODO Check again..
 		// Delete the schedules
 		$oScheduleAdminController = getAdminController('schedule');
 		$output = $oScheduleAdminController->deleteModuleSchedule($module_srl);
@@ -1141,7 +1159,7 @@ class scheduleController extends schedule
 		$oDB = DB::getInstance();
 		$oDB->begin();
 
-		$oSchedule = ScheduleModel::getSchedule($schedule_srl);
+		$oSchedule = scheduleModel::getSchedule($schedule_srl);
 		if ( !$oSchedule->isGranted() )
 		{
 			throw new Rhymix\Framework\Exception('msg_not_permitted_to_delete');
@@ -1188,18 +1206,15 @@ class scheduleController extends schedule
 		$this->deleteSchedule($obj->schedule_srl);
 		$this->setMessage('success_deleted');
 
-		if ( !in_array(Context::getRequestMethod(), array('XMLRPC', 'JSON')) )
+		if ( $obj->list_style )
 		{
-			if ( $obj->list_style )
-			{
-				$redirectUrl = getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category_srl, 'list_style', $obj->list_style, 'schedule_srl', '');
-			}
-			else
-			{
-				$redirectUrl = getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category_srl, 'selected_month', $obj->selected_month, 'schedule_srl', '');
-			}
-			$this->setRedirectUrl($redirectUrl);
+			$redirectUrl = getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category_srl, 'list_style', $obj->list_style, 'schedule_srl', '');
 		}
+		else
+		{
+			$redirectUrl = getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category_srl, 'selected_month', $obj->selected_month, 'schedule_srl', '');
+		}
+		$this->setRedirectUrl($redirectUrl);
 	}
 
 	function AttachFiles($schedule_srl)
@@ -1226,7 +1241,7 @@ class scheduleController extends schedule
 		$schedule_srl = Context::get('schedule_srl');
 
 		 // get the schedule information
-		$oSchedule = ScheduleModel::getSchedule($schedule_srl);
+		$oSchedule = scheduleModel::getSchedule($schedule_srl);
 		if ( !$oSchedule->schedule_srl )
 		{
 			throw new Rhymix\Framework\Exception('msg_not_founded');
@@ -1249,7 +1264,7 @@ class scheduleController extends schedule
 		$args->status = $status ? : 'STANDBY';
 
 		// begin transaction
-		$oDB = &DB::getInstance();
+		$oDB = DB::getInstance();
 		$oDB->begin();
 
 		$output = executeQuery('schedule.updateScheduleStatus', $args);
@@ -1282,14 +1297,13 @@ class scheduleController extends schedule
 			throw new Rhymix\Framework\Exception('msg_invalid_request');
 		}
 
-		$oSchedule = ScheduleModel::getSchedule($schedule_srl);
+		$oSchedule = scheduleModel::getSchedule($schedule_srl);
 		$module_srl = $oSchedule->module_srl;
 		if ( !$module_srl )
 		{
 			throw new Rhymix\Framework\Exception('msg_invalid_request');
 		}
 
-		$status = '';
 		if ( $oSchedule->status == 'STANDBY' )
 		{
 			$status = 'PUBLIC';
@@ -1342,6 +1356,7 @@ class scheduleController extends schedule
 	 */
 	function procScheduleManageCheckedSchedule()
 	{
+		// TODO check again
 		@set_time_limit(0);
 
 		$type = Context::get('type');
@@ -1385,17 +1400,18 @@ class scheduleController extends schedule
 		}
 
 		$this->setMessage($return_message);
+		
 		$redirectUrl = getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminScheduleList', 'module_srl', $module_srl);
 		$this->setRedirectUrl($redirectUrl);
 	}
 
 	function procScheduleMoveMonth()
 	{
-		// check grant
 		if ( $this->module_info->module != 'schedule' )
 		{
 			throw new Rhymix\Framework\Exception('msg_invalid_request');
 		}
+
 		if ( !$this->grant->list )
 		{
 			throw new Rhymix\Framework\Exception('msg_not_permitted_to_view_list');
@@ -1404,25 +1420,23 @@ class scheduleController extends schedule
 		$obj = Context::getRequestVars();
 		$year = preg_replace('/[^0-9]*/s', '', $obj->s_year);
 		$month = preg_replace('/[^0-9]*/s', '', $obj->s_month);
+		
 		if ( strlen($year) != 4 || strlen($month) != 2 )
 		{
 			throw new Rhymix\Framework\Exception('msg_invalid_request');
 		}
 
-		if ( !in_array(Context::getRequestMethod(), array('XMLRPC', 'JSON')) )
-		{
-			$redirectUrl = Context::get('success_return_url') ? : getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category, 'selected_month', $year.$month);
-			$this->setRedirectUrl($redirectUrl);
-		}
+		$redirectUrl = Context::get('success_return_url') ? : getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category, 'selected_month', $year.$month);
+		$this->setRedirectUrl($redirectUrl);
 	}
 
 	function procScheduleSearchSchedule()
 	{
-		// check grant
 		if ( $this->module_info->module != 'schedule' )
 		{
 			throw new Rhymix\Framework\Exception('msg_invalid_request');
 		}
+
 		if ( !$this->grant->list )
 		{
 			throw new Rhymix\Framework\Exception('msg_not_permitted_to_view_list');
@@ -1430,10 +1444,7 @@ class scheduleController extends schedule
 
 		$obj = Context::getRequestVars();
 
-		if ( !in_array(Context::getRequestMethod(), array('XMLRPC', 'JSON')) )
-		{
-			$redirectUrl = Context::get('success_return_url') ? : getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category, 'list_style', $obj->list_style, 'status', $obj->status, 'search_target', $obj->search_target, 'search_keyword', $obj->search_keyword);
-			$this->setRedirectUrl($redirectUrl);
-		}
+		$redirectUrl = Context::get('success_return_url') ? : getNotEncodedUrl('', 'mid', $obj->mid, 'category', $obj->category, 'list_style', $obj->list_style, 'status', $obj->status, 'search_target', $obj->search_target, 'search_keyword', $obj->search_keyword);
+		$this->setRedirectUrl($redirectUrl);
 	}
 }

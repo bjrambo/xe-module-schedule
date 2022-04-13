@@ -663,8 +663,6 @@ class scheduleItem extends BaseObject
 		{
 			FileHandler::writeFile($thumbnail_file, '','w');
 		}
-
-		return;
 	}
 
 	function getLunardayValue($date)
@@ -786,7 +784,7 @@ class scheduleItem extends BaseObject
 		{
 			return array();
 		}
-		return ScheduleModel::getScheduleRecurInfo($this->schedule_srl, $this->get('start_date'), $this->get('end_date'));
+		return scheduleModel::getScheduleRecurInfo($this->schedule_srl, $this->get('start_date'), $this->get('end_date'));
 	}
 
 	function setScheduleRecurDesc()
@@ -821,14 +819,14 @@ class scheduleItem extends BaseObject
 		{
 			$lunarday_value = $lang->regular_type['yearly'] . ' ' . $lang->recur_type['lunar'] . ' ';
 			$s_month = substr($start_date, 4, 2); $e_month = substr($end_date, 4, 2);
-			$lunar_start_date = ScheduleModel::getLunarFromSolar($start_date);
+			$lunar_start_date = scheduleModel::getLunarFromSolar($start_date);
 
 			$lunarday_value .= ($lunar_start_date->is_leap) ? '(윤)' : '';
 			$lunarday_value .= $lunar_start_date->month/1 . '월' . $lunar_start_date->day/1 .'일';
 
 			if ( $start_date != $end_date )
 			{
-				$lunar_end_date = ScheduleModel::getLunarFromSolar($end_date);
+				$lunar_end_date = scheduleModel::getLunarFromSolar($end_date);
 				$lunarday_value .= '~';
 				if ( $s_month != $e_month )
 				{
@@ -1203,7 +1201,7 @@ class scheduleItem extends BaseObject
 				}
 
 				// If not exists, file an image file from the content
-				$config = DocumentModel::getDocumentConfig();
+				$config = documentModel::getDocumentConfig();
 				if ( !$source_file && $config->thumbnail_target !== 'attachment' )
 				{
 					preg_match_all("!<img\s[^>]*?src=(\"|')([^\"' ]*?)(\"|')!is", $content, $matches, PREG_SET_ORDER);

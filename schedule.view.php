@@ -15,7 +15,7 @@ class scheduleView extends schedule
 		if ( $this->module_info->use_private == 'Y' && !$this->grant->manager && !$this->grant->private )
 		{
 			$this->private = TRUE;
-			if ( !Context::get('is_logged') )
+			if (!\Rhymix\Framework\Session::getMemberSrl())
 			{
 				$this->grant->list = FALSE;
 				$this->grant->view = FALSE;
@@ -81,8 +81,9 @@ class scheduleView extends schedule
 		$category_srl = Context::get('category') ? : 0;
 
 		$index = new scheduleItem();
-		Context::set('index', $index);
 		$category_list = $index->getCategoryList($module_info->module_srl);
+		
+		Context::set('index', $index);
 		Context::set('category_list', $category_list);
 
 		// 하위 카테고리가 있을 경우 스케줄 수집시 하위 카테고리의 스케줄도 가져옴
@@ -95,13 +96,14 @@ class scheduleView extends schedule
 
 		$year = substr($selected_month, 0, 4);
 		$month = substr($selected_month, 4, 2);
+		
 		Context::set('year', $year);
 		Context::set('month', $month);
 
 		$date_info = new stdClass();
 		$date_info->day_max = date('t', mktime(0, 0, 0, $month, 1, $year));
 		$date_info->week_start = date('w', mktime(0, 0, 0, $month, 1, $year));
-		$date_info->weeks = ceil(($date_info->day_max + $date_info->week_start) / 7);
+		$date_info->weeks = ceil((intval($date_info->day_max) + intval($date_info->week_start)) / 7);
 		Context::set('date_info', $date_info);
 
 		// if the private function is enabled,  the get the logged user information
@@ -118,21 +120,21 @@ class scheduleView extends schedule
 
 		if ( $module_info->use_lunarday == 'Y' )
 		{
-			$lunarday_list = ScheduleModel::getLunardayList($year, $month);
+			$lunarday_list = scheduleModel::getLunardayList($year, $month);
 			Context::set('lunarday_list', $lunarday_list);
 		}
 		if ( $module_info->use_divisions == 'Y' )
 		{
-			$divisions_list = ScheduleModel::getDivisionsList($year, $month);
+			$divisions_list = scheduleModel::getDivisionsList($year, $month);
 			Context::set('divisions_list', $divisions_list);
 		}
 
-		$specialday_list = ScheduleModel::getSpecialdayList($year, $month, $module_info->use_holiday, $module_info->use_sundry, $module_info->custom_day);
+		$specialday_list = scheduleModel::getSpecialdayList($year, $month, $module_info->use_holiday, $module_info->use_sundry, $module_info->custom_day);
 		Context::set('specialday_list', $specialday_list);
 
 		if ( $this->grant->list )
 		{
-			$schedule_list = ScheduleModel::getSchedulesBySelectedDate($year.$month, $module_info->module_srl, $category_srl, $member_srl);
+			$schedule_list = scheduleModel::getSchedulesBySelectedDate($year.$month, $module_info->module_srl, $category_srl, $member_srl);
 		}
 		else
 		{
@@ -152,14 +154,14 @@ class scheduleView extends schedule
 		}
 
 		// list config setting
-		$list_config = ScheduleModel::getListConfig($module_info->module_srl);
+		$list_config = scheduleModel::getListConfig($module_info->module_srl);
 		if ( !$list_config )
 		{
-			$list_config = ScheduleModel::getDefaultListConfig($module_info->module_srl);
+			$list_config = scheduleModel::getDefaultListConfig($module_info->module_srl);
 		}
 		Context::set('list_config', $list_config);
 
-		Context::set('status_list', ScheduleModel::getScheduleStatusList());
+		Context::set('status_list', scheduleModel::getScheduleStatusList());
 
 		// set a search option used in the template
 		$search_option = array();
@@ -256,7 +258,7 @@ class scheduleView extends schedule
 
 			// get a list
 			$columnList = array('schedule_srl', 'module_srl', 'category_srl', 'title', 'title_color', 'content', 'regdate', 'status', 'uploaded_count', 'start_date', 'end_date', 'selected_date', 'is_allday', 'place', 'is_recurrence', 'nick_name', 'member_srl', 'email_address');
-			$output = ScheduleModel::getScheduleList($args, $columnList);
+			$output = scheduleModel::getScheduleList($args, $columnList);
 
 			// Set values of schedule_model::getScheduleList() objects for a template
 			Context::set('schedule_list', $output->data);
@@ -274,9 +276,6 @@ class scheduleView extends schedule
 			Context::set('page_navigation', new PageHandler(0, 0, 1, 10));
 		}
 
-		/**
-		 * add javascript filters
-		 **/
 		Context::addJsFilter($this->module_path.'tpl/filter', 'search.xml');
 
 		$oSecurity = new Security();
@@ -298,9 +297,8 @@ class scheduleView extends schedule
 			throw new Rhymix\Framework\Exception('msg_not_founded');
 		}
 
-		$oSchedule = ScheduleModel::getSchedule($schedule_srl);
+		$oSchedule = scheduleModel::getSchedule($schedule_srl);
 
-		// if the module srl is not consistent
 		if ( $oSchedule->module_srl != $this->module_info->module_srl )
 		{
 			throw new Rhymix\Framework\Exception('msg_not_founded');
@@ -312,8 +310,9 @@ class scheduleView extends schedule
 		}
 
 		// add the schedule title to the browser
-		Context::setCanonicalURL(getFullUrl('', 'mid', $this->module_info->mid, 'schedule_srl', $oSchedule->schedule_srl));
 		$seo_title = config('seo.document_title') ? config('seo.document_title') : '$SITE_TITLE - $DOCUMENT_TITLE';
+
+		Context::setCanonicalURL(getFullUrl('', 'mid', $this->module_info->mid, 'schedule_srl', $oSchedule->schedule_srl));
 		Context::setBrowserTitle($seo_title, array(
 			'site_title' => Context::getSiteTitle(),
 			'site_subtitle' => Context::getSiteSubtitle(),
@@ -334,10 +333,9 @@ class scheduleView extends schedule
 		// if the private function is enabled
 		if ( $this->private )
 		{
-			$logged_info = Context::get('logged_info');
-			if ( abs($oSchedule->get('member_srl')) != $logged_info->member_srl && !$this->grant->manager )
+			if ( abs($oSchedule->get('member_srl')) != $this->user->member_srl && !$this->grant->manager )
 			{
-				$oSchedule = ScheduleModel::getSchedule(0);
+				$oSchedule = scheduleModel::getSchedule(0);
 			}
 		}
 
@@ -365,7 +363,7 @@ class scheduleView extends schedule
 		// check grant for the schedule and get variables
 		if ( $schedule_srl )
 		{
-			$oSchedule = ScheduleModel::getSchedule($schedule_srl);
+			$oSchedule = scheduleModel::getSchedule($schedule_srl);
 
 			// if the schedule is not granted, then back to the password input form
 			if ( !$oSchedule->isGranted() )
@@ -520,13 +518,12 @@ class scheduleView extends schedule
 		if ( $this->module_info->use_captcha ==='Y' )
 		{
 			$spamfilter_config = ModuleModel::getModuleConfig('spamfilter');
-			$logged_info = Context::get('logged_info');
 			if (
 				isset($spamfilter_config) && isset($spamfilter_config->captcha)
 				&& $spamfilter_config->captcha->type === 'recaptcha'
 				&& $spamfilter_config->captcha->target_actions['document']
 				&& $logged_info->is_admin !== 'Y'
-				&& ( $spamfilter_config->captcha->target_users === 'everyone' || !$logged_info->member_srl )
+				&& ( $spamfilter_config->captcha->target_users === 'everyone' || !$this->user->member_srl )
 				&& ( $spamfilter_config->captcha->target_frequency === 'every_time' || !isset($_SESSION['recaptcha_authenticated']) || !$_SESSION['recaptcha_authenticated'] )
 				&& ( $spamfilter_config->captcha->target_devices[Mobile::isFromMobilePhone() ? 'mobile' : 'pc'] )
 			)
@@ -564,11 +561,12 @@ class scheduleView extends schedule
 		}
 
 		$schedule_srl = Context::get('schedule_srl');
-		$oSchedule = ScheduleModel::getSchedule($schedule_srl);
+		$oSchedule = scheduleModel::getSchedule($schedule_srl);
 
 		// if the schedule is not existed, then back to the scheduler content page
 		if ( !$oSchedule->isExists() )
 		{
+			//TODO check again
 			return $this->dispScheduleContentView();
 		}
 

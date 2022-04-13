@@ -3,13 +3,13 @@
 class scheduleModel extends schedule
 {
 
-	protected static $schedule_config = NULL;
+	public static $schedule_config = NULL;
 
 	public static function getScheduleConfig()
 	{
 		if ( self::$schedule_config === NULL )
 		{
-			self::$schedule_config = ModuleModel::getModuleConfig('schedule') ?: new stdClass;;
+			self::$schedule_config = moduleModel::getModuleConfig('schedule') ?: new stdClass;
 		}
 
 		return self::$schedule_config;
@@ -22,7 +22,7 @@ class scheduleModel extends schedule
 	{
 		// get the list config value, if it is not exitsted then setup the default value
 		$list = array();
-		$list_config = ModuleModel::getModulePartConfig('schedule', $module_srl);
+		$list_config = moduleModel::getModulePartConfig('schedule', $module_srl);
 		if ( !is_array($list_config) || count($list_config) <= 0 || !$list_config[0] )
 		{
 			$virtual_config = array('no', 'title', 'selected_date');
@@ -55,22 +55,22 @@ class scheduleModel extends schedule
 		return $extra_vars;
 	}
 
-	function getScheduleInfo($module_srl)
+	public static function getScheduleInfo($module_srl)
 	{
-		return ModuleModel::getModuleInfoByModuleSrl($module_srl);
+		return moduleModel::getModuleInfoByModuleSrl($module_srl);
 	}
 
-	function getScheduleInfoByMid($mid)
+	public static function getScheduleInfoByMid($mid)
 	{
-		return ModuleModel::getModuleInfoByMid($mid);
+		return moduleModel::getModuleInfoByMid($mid);
 	}
 
-	function getScheduleStatusList()
+	public static function getScheduleStatusList()
 	{
 		return lang('status_list');
 	}
 
-	function _setSortIndex($obj)
+	public static function _setSortIndex($obj)
 	{
 		$args = new stdClass;
 		$args->sort_index = $obj->sort_index ?? null;
@@ -85,7 +85,7 @@ class scheduleModel extends schedule
 		return $args;
 	}
 
-	function _setSearchOption($searchOpt, &$args, &$query_id, &$use_division)
+	public static function _setSearchOption($searchOpt, &$args, &$query_id, &$use_division)
 	{
 		$args = new stdClass;
 		$args->module_srl = $searchOpt->module_srl ?? null;
@@ -113,7 +113,7 @@ class scheduleModel extends schedule
 		// get directly module_srl by mid
 		if ( isset($searchOpt->mid) && $searchOpt->mid )
 		{
-			$args->module_srl = ModuleModel::getModuleSrlByMid($searchOpt->mid);
+			$args->module_srl = moduleModel::getModuleSrlByMid($searchOpt->mid);
 		}
 
 		// add subcategories
@@ -166,8 +166,8 @@ class scheduleModel extends schedule
 			// exclude secret documents in searching if current user does not have privilege
 			if ( !isset($args->member_srl) || !$args->member_srl || !Context::get('is_logged') || $args->member_srl !== Context::get('logged_info')->member_srl )
 			{
-				$module_info = ModuleModel::getModuleInfoByModuleSrl($args->module_srl);
-				if ( !ModuleModel::getGrant($module_info, Context::get('logged_info'))->manager )
+				$module_info = moduleModel::getModuleInfoByModuleSrl($args->module_srl);
+				if ( !moduleModel::getGrant($module_info, Context::get('logged_info'))->manager )
 				{
 					$args->status = 'PUBLIC';
 				}
@@ -227,7 +227,7 @@ class scheduleModel extends schedule
 		}
 	}
 
-	function getSchedule($schedule_srl)
+	public static function getSchedule($schedule_srl)
 	{
 		if ( !$schedule_srl )
 		{
@@ -253,7 +253,7 @@ class scheduleModel extends schedule
 		return $GLOBALS['RX_SCHEDULE_LIST'][$schedule_srl];
 	}
 
-	function getSchedules($schedule_srls)
+	public static function getSchedules($schedule_srls)
 	{
 		$schedule_list = array();
 
@@ -282,7 +282,7 @@ class scheduleModel extends schedule
 		return $schedule_list;
 	}
 
-	function getSchedulesBySelectedDate($selected_date = null, $module_srl = null, $category_srl = 0, $member_srl = null)
+	public static function getSchedulesBySelectedDate($selected_date = null, $module_srl = null, $category_srl = 0, $member_srl = null)
 	{
 		$args = new stdClass();
 		$args->selected_date = $selected_date;
@@ -336,7 +336,7 @@ class scheduleModel extends schedule
 		return $schedule_list;
 	}
 
-	function getScheduleList($obj, $columnList = array())
+	public static function getScheduleList($obj, $columnList = array())
 	{
 		$sort_check = self::_setSortIndex($obj);
 		$obj->sort_index = $sort_check->sort_index;
@@ -366,7 +366,7 @@ class scheduleModel extends schedule
 		return $output;
 	}
 
-	function getAPIInfo($lunar_mode = false)
+	public static function getAPIInfo($lunar_mode = false)
 	{
 		$api_info = array();
 		$schedule_config = self::getScheduleConfig();
@@ -384,7 +384,7 @@ class scheduleModel extends schedule
 		return $api_info;
 	}
 
-	function getHolidayList($year, $month)
+	public static function getHolidayList($year, $month)
 	{
 		$holidays = array();
 
@@ -478,7 +478,7 @@ class scheduleModel extends schedule
 		return $holidays;
 	}
 
-	function getSundryList($year, $month)
+	public static function getSundryList($year, $month)
 	{
 		$sundry_days = array();
 
@@ -565,8 +565,8 @@ class scheduleModel extends schedule
 
 		return $sundry_days;
 	}
-
-	function getSpecialdayListBySelf($year, $month, $use_holiday, $use_sundry)
+	
+	public static function getSpecialdayListBySelf($year, $month, $use_holiday, $use_sundry)
 	{
 		$container = array();
 
@@ -583,7 +583,7 @@ class scheduleModel extends schedule
 		return $container;
 	}
 
-	function getSpecialdayList($year, $month, $use_holiday, $use_sundry, $customs)
+	public static function getSpecialdayList($year, $month, $use_holiday, $use_sundry, $customs)
 	{
 		$container = array();
 
@@ -718,7 +718,7 @@ class scheduleModel extends schedule
 		return $container;
 	}
 
-	function getLunardayListBySelf($year, $month)
+	public static function getLunardayListBySelf($year, $month)
 	{
 		include_once __DIR__ . '/lib/lib.calendar.php';
 		include_once __DIR__ . '/lib/lib.lunarday.php';
@@ -737,7 +737,7 @@ class scheduleModel extends schedule
 		return $lunarday_list;
 	}
 
-	function getLunardayList($year, $month)
+	public static function getLunardayList($year, $month)
 	{
 		$lunarday_list = array();
 
@@ -782,7 +782,7 @@ class scheduleModel extends schedule
 		return $lunarday_list;
 	}
 
-	function getDivisionsListBySelf($year, $month)
+	public static function getDivisionsListBySelf($year, $month)
 	{
 		include_once __DIR__ . '/lib/lib.calendar.php';
 		include_once __DIR__ . '/lib/lib.divisions.php';
@@ -805,7 +805,7 @@ class scheduleModel extends schedule
 		return $divisions_list;
 	}
 
-	function getDivisionsList($year, $month)
+	public static function getDivisionsList($year, $month)
 	{
 		$divisions_list = array();
 
@@ -863,7 +863,7 @@ class scheduleModel extends schedule
 		return $divisions_list;
 	}
 
-	function getScheduleRecurInfo($schedule_srl, $start_date, $end_date)
+	public static function getScheduleRecurInfo($schedule_srl, $start_date, $end_date)
 	{
 		if ( !$schedule_srl )
 		{
@@ -935,7 +935,7 @@ class scheduleModel extends schedule
 		return $output->data;
 	}
 
-	function isHoliday($date)
+	public static function isHoliday($date)
 	{
 		$schedule_config = self::getScheduleConfig();
 		$module_info = self::getScheduleInfoByMid(Context::get('mid'));
@@ -989,17 +989,17 @@ class scheduleModel extends schedule
 		}
 	}
 
-	function isSaturday($date)
+	public static function isSaturday($date)
 	{
 		return (date('N', strtotime($date)) == 6);
 	}
 
-	function isSunday($date)
+	public static function isSunday($date)
 	{
 		return (date('N', strtotime($date)) == 7);
 	}
 
-	function getLunarFromSolar($date)
+	public static function getLunarFromSolar($date)
 	{
 		$year = substr($date, 0, 4);
 		$month = substr($date, 4, 2);
@@ -1056,7 +1056,7 @@ class scheduleModel extends schedule
 		return $lunar_date;
 	}
 
-	function getSolarFromLunar($date)
+	public static function getSolarFromLunar($date)
 	{
 		$year = substr($date, 0, 4);
 		$month = substr($date, 4, 2);
