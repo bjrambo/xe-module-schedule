@@ -164,7 +164,8 @@ class scheduleAdminController extends schedule
 			$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispScheduleAdminCategoryInfo', 'module_srl', $output->get('module_srl')));
 		}
 	}
-
+	
+	// TODO: what is this? WT?
 	function deleteModuleSchedule($module_srl)
 	{
 		$args = new stdClass;
@@ -182,6 +183,7 @@ class scheduleAdminController extends schedule
 		// remove from cache
 		foreach ( $schedule_list as $schedule )
 		{
+			//TODO it is not static;
 			ScheduleController::clearScheduleCache($schedule->document_srl);
 		}
 
