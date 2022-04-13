@@ -90,7 +90,7 @@ class scheduleAdminView extends schedule
 		Context::set('page_navigation', $output->page_navigation);
 
 		$oModuleAdminModel = getAdminModel('module');
-		$selected_manage_content = $oModuleAdminModel->getSelectedManageHTML($this->xml_info->grant, array('tab1'=>1, 'tab3'=>1));
+		$selected_manage_content = $oModuleAdminModel->getSelectedManageHTML($this->xml_info->grant, array('tab1'=>1, 'tab3'=>1), $this->module_path);
 		Context::set('selected_manage_content', $selected_manage_content);
 
 		$security = new Security();
