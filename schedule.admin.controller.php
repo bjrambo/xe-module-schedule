@@ -49,6 +49,7 @@ class scheduleAdminController extends schedule
 
 	function procScheduleAdminInsertConfig()
 	{
+		$schedule_config = scheduleModel::getScheduleConfig();
 		$schedule_config->api = Context::get('api');
 
 		$oModuleController = getController('module');
