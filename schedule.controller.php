@@ -392,7 +392,7 @@ class scheduleController extends schedule
 				}
 			}
 			// 월간 요일 설정의 갯수를 구함
-			$c = count($week_step);
+			$week_step_count = count($week_step);
 
 			$new_month = false;
 			foreach ( $candidates as $candidate )
@@ -400,105 +400,126 @@ class scheduleController extends schedule
 				// 반복 횟수가 지정되어 있으면
 				if ( $recur_freq )
 				{
+					// TODO : 이걸 지워야겟네;;;
+					$date_count = 0;
 					for ( $i = 0; $i < $recur_freq; $i++ )
 					{
+						if($date_count >= $recur_freq)
+						{
+							break;
+						}
+						$week_last_day = date('Ymt', $candidate);
 						// 1회차이거나 새로운 달일 때 요일 설정을 월별 날짜 순으로 재정렬 : 월마다 설정된 요일의 순서가 다를 수 있기 때문
 						if ( $i == 0 || $new_month )
 						{
 							$selected_weekdays = [];
 							foreach ( $week_step as $_weekday )
 							{
-								if ( !$new_month )
-								{
-									$_weekday_format = strtotime($_weekday . ' of this month', $candidate);
-								}
-								else
-								{
-									$_weekday_format = strtotime($_weekday . ' of +1 month', $candidate);
-								}
+								$_weekday_format = strtotime($_weekday . ' of this month', $candidate);
 								$selected_weekdays[date('Ymd', $_weekday_format)] = $_weekday;
+
+								foreach ($selected_weekdays as $selected_date => $selected_weekday)
+								{
+									if(intval($selected_date) >= intval($week_last_day))
+									{
+										if(intval($selected_date) > intval($week_last_day))
+										{
+											unset($selected_weekdays[$selected_date]);
+										}
+									}
+								}
 							}
+
 							// 날짜 순으로 요일 목록을 재정렬
 							ksort($selected_weekdays);
 							// 해당 월의 1회차 요일 설정이 적용됐으므로, $new_month 값은 false로 반환
 							$new_month = false;
 						}
 
-						// 반복 횟수를 요일 설정 갯수로 나누고 나머지값을 구함 => 0으로 시작하는 월별 키값 배당
-						$key = $i % $c;
-						// 키값에 따라 해당 월의 요일 설정을 가져옴
-						$_week_step = array_values($selected_weekdays)[$key];
 
-						// 전체 1회차이거나 해당 월의 2회차 이상인 경우
-						if ( $i == 0 || $key != 0 )
+						$keyic = $i % $week_step_count;
+						$_week_step = array_values($selected_weekdays)[$keyic];
+						
+						foreach ($selected_weekdays as $selected_date => $selected_weekday)
 						{
-							$candidate = strtotime($_week_step . ' of this month', $candidate);
-							// 해당 월의 마지막 순번이면 $new_month 값을 true로 반환
-							if ( $key == $c - 1 )
+							if($date_count >= $recur_freq)
 							{
-								$new_month = true;
+								break;
 							}
-						}
-						// 전체 1회차가 아닌 한에서, 해당 월의 1회차인 경우
-						else
-						{
-							$candidate = strtotime($_week_step . ' of +1 month', $candidate);
-						}
-
-						// 현재 일자가 종료일을 지난 경우 break하고 다음 후보일($candidate)로 넘어감
-						if ( $stop_date && $candidate > $stop )
-						{
-							break 1;
-						}
-						// 현재 일자가 시작일보다 앞선 경우 빈도수 1 증가시키고 continue
-						if ( $candidate < $start )
-						{
-							$recur_freq++;
-							continue;
-						}
-
-						$date = date($output_format, $candidate);
-						if ( in_array($date, $dates) )
-						{
-							continue;
-						}
-
-						// 제외 설정이 있을 경우 가져와서 적용
-						if ( $exception_type )
-						{
-							// TODO it is not static
-							$is_holiday = scheduleModel::isHoliday($date);
-							if ( $has_holiday && $is_holiday )
+							$date = date($output_format, strtotime($selected_date));
+							$selected_date_to_time = strtotime($selected_date);
+							$next_week_date = date('Ymd', strtotime("+1 week", $selected_date_to_time));
+							
+							if($week_last_day < $next_week_date)
 							{
-								switch ( $exception_option )
-								{
-									case 'prev_week':
-										$_step = '-1 week';
-										break;
-									case 'next_week':
-										$_step = '+1 week';
-										break;
-									default:
-										$candidate = strtotime($step, $candidate);
-										continue 2;
-								}
+								$testdate_3 = date('Ymd', $candidate);
+								$new_month = true;
+								$candidate = strtotime("+1 week", $selected_date_to_time);
 								
-								// TODO it is not static
-								$_date = date($output_format, strtotime($_step, $candidate));
-								while ( scheduleModel::isHoliday($_date) )
-								{
-									$_date = date($output_format, strtotime($_date . ' ' . $_step));
-								}
-
-								if ( !in_array($_date, $dates) && (!$stop_date || $_date <= $stop_date) )
-								{
-									$dates[] = $_date;
-								}
-
+								$testdate_1 = date('Ymd', $candidate);
+							}
+							else
+							{
+								$candidate = strtotime($_week_step . ' of this month', $candidate);
+								$testdate_2 = date('Ymd', $candidate);
+							}
+							
+							// 현재 일자가 종료일을 지난 경우 break하고 다음 후보일($candidate)로 넘어감
+							if ( $stop_date && $selected_date > $stop )
+							{
+								break 1;
+							}
+							// 현재 일자가 시작일보다 앞선 경우 빈도수 1 증가시키고 continue
+							
+							if ($selected_date_to_time < $start)
+							{
+								$recur_freq++;
 								continue;
 							}
+
+
+							if ( in_array($date, $dates) )
+							{
+								continue;
+							}
+
+							// 제외 설정이 있을 경우 가져와서 적용
+							if ( $exception_type )
+							{
+								$is_holiday = scheduleModel::isHoliday($date);
+								if ( $has_holiday && $is_holiday )
+								{
+									switch ( $exception_option )
+									{
+										case 'prev_week':
+											$_step = '-1 week';
+											break;
+										case 'next_week':
+											$_step = '+1 week';
+											break;
+										default:
+											break;
+									}
+
+									// TODO it is not static
+									$_date = date($output_format, strtotime($_step, $candidate));
+									while ( scheduleModel::isHoliday($_date) )
+									{
+										$_date = date($output_format, strtotime($_date . ' ' . $_step));
+									}
+
+									if ( !in_array($_date, $dates) && (!$stop_date || $_date <= $stop_date) )
+									{
+										$dates[] = $_date;
+									}
+
+									continue;
+								}
+							}
+							$dates[] = $date;
+							$date_count++;
 						}
-						$dates[] = $date;
+						$candidate = strtotime($step, $candidate);
 					}
 				}
 				// 반복 횟수 지정 업이 종료일만 지정되어 있으면
@@ -530,7 +551,7 @@ class scheduleController extends schedule
 						}
 
 						// 반복 횟수를 요일 설정 갯수로 나누고 나머지값을 구함 => 0으로 시작하는 월별 키값 배당
-						$key = $i % $c;
+						$key = $i % $week_step_count;
 						// 키값에 따라 해당 월의 요일 설정을 가져옴
 						$_week_step = array_values($selected_weekdays)[$key];
 
@@ -539,7 +560,7 @@ class scheduleController extends schedule
 						{
 							$candidate = strtotime($_week_step . ' of this month', $candidate);
 							// 해당 월의 마지막 순번이면 $new_month 값을 true로 반환
-							if ( $key == $c - 1 )
+							if ( $key == $week_step_count - 1 )
 							{
 								$new_month = true;
 							}
@@ -637,7 +658,7 @@ class scheduleController extends schedule
 							$is_holiday = scheduleModel::isHoliday($date);
 							$is_saturday = scheduleModel::isSaturday($date);
 							$is_sunday = scheduleModel::isSunday($date);
-
+							
 							if ( ($has_holiday && $is_holiday) || ($has_saturday && $is_saturday) || ($has_sunday && $is_sunday) )
 							{
 								switch ( $exception_option ) {
@@ -752,7 +773,7 @@ class scheduleController extends schedule
 							$is_holiday = scheduleModel::isHoliday($date);
 							$is_saturday = scheduleModel::isSaturday($date);
 							$is_sunday = scheduleModel::isSunday($date);
-
+							
 							if ( ($has_holiday && $is_holiday) || ($has_saturday && $is_saturday) || ($has_sunday && $is_sunday) )
 							{
 								switch ( $exception_option ) {
